@@ -1,4 +1,4 @@
-package validation;
+package dimensionvalidation;
 
 public class UndeterminedDimensionException extends RuntimeException {
 	

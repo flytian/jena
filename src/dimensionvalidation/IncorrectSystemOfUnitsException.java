@@ -1,4 +1,4 @@
-package validation;
+package dimensionvalidation;
 
 public class IncorrectSystemOfUnitsException extends RuntimeException {
 

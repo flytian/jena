@@ -1,4 +1,4 @@
-package validation;
+package dimensionvalidation;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
