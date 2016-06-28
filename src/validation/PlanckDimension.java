@@ -22,7 +22,44 @@ public class PlanckDimension implements Dimension{
 	public PlanckDimension(String dimensionIn) {
 		dimensionUnits = dimensionIn;
 		
-		switch (dimensionUnits)
+		dimensionUnits = dimensionIn;
+		String quantityString=null;
+		String quantityKind=null;
+		
+		/*
+		String checkSystem = prefixes + NL + 
+				"ASK { Unit:" + dimensionUnits + "rdf:type qudt:NotUsedWithSIUnits } ";
+		Query systemQuery = QueryFactory.create(checkSystem, Syntax.syntaxSPARQL);
+		QueryExecution systemqexec = QueryExecutionFactory.create(systemQuery, unitsOntology);
+		Boolean nonSIsystem = systemqexec.execAsk();
+		systemqexec.close();
+		
+		if(nonSIsystem == false) {
+			throw new IncorrectSystemOfUnitsException();
+		}
+		*/
+		
+		String findQuantityKind = prefixes + NL +
+				"SELECT ?quantity " + NL +
+				"WHERE { \n"
+				+ "unit:" + dimensionUnits + " rdf:type ?quantity \n } \n "
+				+ "MINUS { \n"
+				+ "unit:" + dimensionUnits + " rdf:type qudt:NotUsedWithSIUnit; qudt:DerivedUnit; qudt:SIBaseUnit; "
+						+ "qudt:NonSIUnit; qudt:SIDerivedUnit ."
+				+ "\n }";
+		Query quantityQuery = QueryFactory.create(findQuantityKind, Syntax.syntaxSPARQL);
+		QueryExecution queryExec = QueryExecutionFactory.create(quantityQuery, dimensionsOntology);
+		ResultSet rs = queryExec.execSelect();
+		for (; rs.hasNext() ; ) {				
+			QuerySolution rb = rs.nextSolution();
+			Resource quantity = (Resource) rb.getResource("quantity"); 
+			quantityString = quantity.getLocalName();
+		}
+		queryExec.close();
+		quantityString = quantityString.substring(5);	
+		quantityKind = quantityString.replaceAll("Unit", "");
+		
+		switch (quantityKind)
 		{
 		case "Length" :
 			L=1;
@@ -48,7 +85,7 @@ public class PlanckDimension implements Dimension{
 		
 		String queryString = prefixes + NL +
 				"SELECT ?vector " + NL +
-				"WHERE { ?dimension qudt:referenceQuantity qudt-quantity:" + dimensionUnits + " ; \n "
+				"WHERE { ?dimension qudt:referenceQuantity qudt-quantity:" + quantityKind + " ; \n "
 				+ "rdfs:label ?label ; \n"
 				+ "qudt:dimensionVector ?vector ; \n"
 				+ "qudt:symbol ?symbol . \n"
