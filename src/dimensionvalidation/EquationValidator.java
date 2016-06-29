@@ -13,7 +13,7 @@ public class EquationValidator {
 		
 		String systemOfUnits = "SI"; //sets system of units for query
 		/*
-		 * Key for systemOfUnits:
+		 * KEY for systemOfUnits:
 		 * "SI" = International System
 		 * "US" = US Customary System
 		 * "CGS" = Gauss/Centimetre-gram-second System
