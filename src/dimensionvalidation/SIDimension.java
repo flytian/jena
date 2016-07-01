@@ -27,7 +27,7 @@ public class SIDimension implements Dimension{
 		String quantityKind=null;
 		
 		String checkSystem = prefixes + NL + 
-				"ASK { Unit:" + dimensionUnits + "rdf:type qudt:NotUsedWithSIUnits } ";
+				"ASK { unit:" + dimensionUnits + " rdf:type qudt:NotUsedWithSIUnit } ";
 		Query systemQuery = QueryFactory.create(checkSystem, Syntax.syntaxSPARQL);
 		QueryExecution systemqexec = QueryExecutionFactory.create(systemQuery, unitsOntology);
 		Boolean nonSIsystem = systemqexec.execAsk();
@@ -40,21 +40,21 @@ public class SIDimension implements Dimension{
 		String findQuantityKind = prefixes + NL +
 				"SELECT ?quantity " + NL +
 				"WHERE { \n"
-				+ "unit:" + dimensionUnits + " rdf:type ?quantity \n } \n "
-				+ "MINUS { \n"
-				+ "unit:" + dimensionUnits + " rdf:type qudt:NotUsedWithSIUnit; qudt:DerivedUnit; qudt:SIBaseUnit; "
-						+ "qudt:NonSIUnit; qudt:SIDerivedUnit ."
+				+ "unit:" + dimensionUnits + " rdf:type ?quantity . \n "
+				+ "FILTER (?quantity !=  qudt:DerivedUnit ) \n "
+				+ "FILTER (?quantity != qudt:SIBaseUnit ) \n "
+				+ "FILTER (?quantity != qudt:NonSIUnit ) \n "
+				+ "FILTER (?quantity != qudt:SIDerivedUnit ) \n "
 				+ "\n }";
 		Query quantityQuery = QueryFactory.create(findQuantityKind, Syntax.syntaxSPARQL);
-		QueryExecution queryExec = QueryExecutionFactory.create(quantityQuery, dimensionsOntology);
+		QueryExecution queryExec = QueryExecutionFactory.create(quantityQuery, unitsOntology);
 		ResultSet rs = queryExec.execSelect();
 		for (; rs.hasNext() ; ) {				
 			QuerySolution rb = rs.nextSolution();
 			Resource quantity = (Resource) rb.getResource("quantity"); 
-			quantityString = quantity.getLocalName();
+			quantityString = quantity.getLocalName(); //output of form BlahBlahUnit
 		}
 		queryExec.close();
-		quantityString = quantityString.substring(5);	
 		quantityKind = quantityString.replaceAll("Unit", "");
 		
 		switch (quantityKind)

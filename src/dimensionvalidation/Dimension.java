@@ -16,7 +16,8 @@ public interface Dimension {
 			+ "PREFIX qudt-quantity:  <http://qudt.org/vocab/quantity#> " + NL
 			+ "PREFIX qudt-unit:  <http://qudt.org/vocab/unit#> " + NL
 			+ "PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + NL
-			+ "PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#> ";
+			+ "PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>" + NL
+			+ "PREFIX unit: <http://qudt.org/vocab/unit#>";
 	
 	public String toString();
 	public String getDimensionUnits();

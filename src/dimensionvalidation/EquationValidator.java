@@ -26,7 +26,7 @@ public class EquationValidator {
 		
 		Model manufacturingOntology = RDFDataMgr.loadModel("manufacturing.ttl"); //ontology defining the quantity of each variable
 		Model notebookTriples = RDFDataMgr.loadModel("temp-doc-turning-triples.ttl");
-		Model equationModel = RDFDataMgr.loadModel("testcase-3.ttl"); //ontology containing the Turtle code for each equation
+		Model equationModel = RDFDataMgr.loadModel("testcase-1.ttl"); //ontology containing the Turtle code for each equation
 		
 		Model ontologyModel = ModelFactory.createDefaultModel();
 		ontologyModel.add(manufacturingOntology);
@@ -71,13 +71,15 @@ public class EquationValidator {
 			throw new UnmatchedLeftAndRightException(); //if equations didn't split into RHS and LHS correctly 
 		} 
 		
-		for(int i =0; i<nameURI.size(); i++) { //processes each equation in the ontology based on its URI
-			//add triples to tempModel
+		for(int i =0; i<nameURI.size(); i++) { //processes each equation in the ontology based on its URI, adds triples to tempModel
+			System.out.println("Proportionality: " + equationID.checkProportionality(nameURI.get(i)));
+						
 			Property isConsistent = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#isConsistentWith");
 			Property isNotConsistent = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#isNotConsistentWith");
 			Property hasDimensionVector = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionVector");
 			Property hasDimensionalConsistency = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionalConsistency");
 			Property inconsistencyCause = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#inconsistencyCause");
+			
 			/*
 			Property hasSystemOfUnits = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasSystemOfUnits");
 			Property hasRHS = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionVector");
@@ -92,7 +94,10 @@ public class EquationValidator {
 				
 			
 			try 
-			{
+			{			
+				dimLHS = equationID.findDimensionality(nameURI.get(i), "hasLHS", systemOfUnits);	
+				dimRHS = equationID.findDimensionality(nameURI.get(i), "hasRHS", systemOfUnits);
+				
 				/*
 				System.out.println("EQUATION URI: " + nameURI.get(i));	
 				equationID.printObject(nameURI.get(i), "hasRHS"); //prints out table of RHS factors
@@ -108,9 +113,6 @@ public class EquationValidator {
 				System.out.println();
 				*/
 				
-				dimLHS = equationID.findDimensionality(nameURI.get(i), "hasLHS", systemOfUnits);	
-				dimRHS = equationID.findDimensionality(nameURI.get(i), "hasRHS", systemOfUnits);
-				
 				//triples about dimensionality of each side
 				Literal aDim = ResourceFactory.createStringLiteral(dimRHS.getVector());
 				Literal bDim = ResourceFactory.createStringLiteral(dimLHS.getVector());			
@@ -119,26 +121,23 @@ public class EquationValidator {
 				
 				//triples comparing dimensionality of LHS and RHS
 				if(dimLHS.equals(dimRHS)) { 
-					//System.out.println("The dimensionality of the LHS (" + dimLHS.getDimensionUnits() + 
-							//") is consistent with the dimensionality of the RHS (" + dimRHS.getDimensionUnits() + ").");
 					a.addProperty(isConsistent, b);
 					c.addLiteral(hasDimensionalConsistency, true);
-					
+					System.out.println("Consistent equation");
 				} else {
-					//System.out.println("The dimensionality of the LHS (" + dimLHS.getDimensionUnits() + 
-							//") is NOT consistent with the dimensionality of the RHS (" + dimRHS.getDimensionUnits() + ").");
 					a.addProperty(isNotConsistent, b);
 					c.addLiteral(hasDimensionalConsistency, false);
 					c.addProperty(inconsistencyCause, d);
+					System.out.println("Inconsistent equation");
 				}	
 			} 
 			catch (UndeterminedDimensionException e) 
 			{
-				//System.out.println("ERROR: Non-integer exponent - dimensions cannot be determined" + NL);
+				System.out.println("ERROR: Non-integer exponent - dimensions cannot be determined" + NL);
 				c.addProperty(inconsistencyCause, f);
 			}
 		}
-		
+		/*
 		String fileName = "tempOntology.ttl"; //name of file where triples are stored, located in workspace
 		
 		//write triples to a new file
@@ -160,7 +159,9 @@ public class EquationValidator {
 		{
 			System.out.println("I guess an error occurred when trying to write the triples to a file. ");
 		}
-
+		*/
+		
+		/*
 		//key to explain dimension symbols
 		System.out.println();	
 		System.out.println();
@@ -198,8 +199,8 @@ public class EquationValidator {
 				+ "J: Luminous Intensity (candela) \n"
 				+ "U: Dimensionless");
 		} 
-		
-
+		*/
+	
 	}
 
 }

@@ -15,18 +15,20 @@ public class Identifier {
 	private Model myModel;	//the model that is being parsed for triples
 	private String prefixes; //list of any and all prefixes used in ontology ----> write a method to parse this?
 	
-	//constructor
-	public Identifier() {
-		myModel = ModelFactory.createDefaultModel();
-		prefixes = null;
-		ontologyModel = ModelFactory.createDefaultModel();
-	}
+	//constructors
 	
-	//constructor
 	public Identifier(Model equationModel, Model ontologyModelIn, String prefixesIn){
 		myModel = equationModel;
 		prefixes = prefixesIn;
 		ontologyModel = ontologyModelIn;
+	}
+	
+	public Identifier(Model equationModel, String prefixesIn){
+		this(equationModel, ModelFactory.createDefaultModel(), prefixesIn);
+	}
+	
+	public Identifier() {
+		this( ModelFactory.createDefaultModel(), null);
 	}
 	
 	//get prefix String
@@ -257,6 +259,99 @@ public class Identifier {
 		} 
 		
 		return finalDimension;	
+	}
+	
+	public Boolean checkProportionality(String equationURI){
+		Boolean consistency=true;
+		
+		ArrayList<String> factors = new ArrayList<String>(); //list of factors of each side of the equation
+		
+		String nameQuery = ":" +equationURI+" :hasRHS _:d . \n "
+				+ " _:d :hasTerm _:a . \n" + 
+				" _:a :hasFactor _:b . \n " + 
+				" _:b :hasVar _:c . \n "
+				+ "_:c :hasName ?name . \n";
+		String supQuery =  "_:c :hasSuperscript _:f . \n "
+				+ "_:f :hasExpression ?superscript . \n ";
+		
+		//query to create list of names of factors in equation
+		String queryString03 =   prefixes + NL +
+				"SELECT ?name " + NL +
+				"WHERE { \n " + nameQuery + "\n }";
+		Query query03 = QueryFactory.create(queryString03, Syntax.syntaxSPARQL);
+		QueryExecution qexec03 = QueryExecutionFactory.create(query03, myModel);
+		ResultSet names = qexec03.execSelect();
+		for (; names.hasNext() ; ) {
+			QuerySolution rb = names.nextSolution();
+			LiteralImpl x = (LiteralImpl) rb.getLiteral("name");
+			factors.add(x.getString());
+		}
+		qexec03.close();
+		
+		String nameStatement; //customized query w name of each factor
+		String checkSuperscript; //query to check for presence of superscript to factor
+		
+		for (int index=0;index<factors.size(); index++) {
+			
+			nameStatement = ":" +equationURI+" :hasRHS _:d . \n "
+					+ " _:d :hasTerm _:a . \n" + 
+					" _:a :hasFactor _:b . \n " + 
+					" _:b :hasVar _:c . \n "
+					+ "_:c :hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
+
+			checkSuperscript =  prefixes + NL +
+					"ASK {" + nameStatement + supQuery + "}";
+			Query query02 = QueryFactory.create(checkSuperscript) ;
+			QueryExecution qexec02 = QueryExecutionFactory.create(query02, myModel) ;
+			Boolean superscriptPresent = qexec02.execAsk();
+			qexec02.close();
+			
+			String checkProportionality =  prefixes + NL +
+					"ASK { \n :" + factors.get(index) + " :isDirectlyProportionalTo ?object }"; 
+			/*
+			 * PROBLEM: What does the name from the equation correspond to? Probably the variable name
+			 * from the notebook. So, I need to query variable name -> concept -> description node -> 
+			 * whether or not the relationship is directly or indirectly proportional
+			 */
+			Query query = QueryFactory.create(checkProportionality) ;
+			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+			Boolean directlyProportional = qexec.execAsk();
+			System.out.println("Directly Proportional? " + directlyProportional);
+			qexec.close();
+			
+			if(superscriptPresent) {
+
+				String queryString =   prefixes + NL +
+						"SELECT ?superscript" + NL +
+						"WHERE { \n "+ nameStatement + supQuery + " }";
+				Query query01 = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
+				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel) ;
+				ResultSet rs = qexec01.execSelect();
+
+				for ( ; rs.hasNext() ; ){
+					QuerySolution rb = rs.nextSolution() ;
+					LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
+					if(!(y.getDatatype()).equals(XSDDatatype.XSDinteger)) {
+						throw new UndeterminedDimensionException();
+					}
+					double superscript = y.getDouble();
+					
+					if(directlyProportional == true && superscript<0) {
+						consistency=false;
+					} else if (directlyProportional == false && superscript>0) {
+						consistency=false;
+					}
+				}
+				qexec.close() ;
+
+			} else {
+				if (directlyProportional != true) {
+					consistency = false;
+				}
+			}
+		} 
+		
+		return consistency;
 	}
 
 	//prints out a table of subject and objects for a given predicate
