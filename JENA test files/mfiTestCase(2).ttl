@@ -1,0 +1,38 @@
+@prefix : <http://modelmeth.nist.gov/manufacturing#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:realURI :hasLHS _:exp31719 .
+_:exp31719 :hasTerm _:term31720 .
+_:term31720 rdf:type :term .
+_:term31720 :hasFactor _:factor31721 .
+_:factor31721 :hasVar _:var31722 .
+_:var31722 :hasName "Y"^^xsd:string .
+_:term31720 :hasFactor _:factor31721 .
+_:factor31721 :hasPosition "1"^^xsd:integer .
+_:term31720 rdf:type :term .
+_:term31720 :hasPosition "1"^^xsd:integer .
+
+:realURI :hasRHS _:exp31723 .
+_:exp31723 :hasTerm _:term31724 .
+_:term31724 rdf:type :term .
+_:term31724 :hasFactor _:factor31725 .
+_:factor31725 :hasVar _:var31726 .
+_:var31726 :hasName "beta"^^xsd:string .
+_:var31726 :hasSubscript _:sub31727 .
+_:sub31727 rdf:type :subscript .
+_:sub31727 :hasExpression "1"^^xsd:integer .
+
+_:term31724 :hasFactor _:factor31725 .
+_:factor31725 :hasPosition "1"^^xsd:integer .
+_:term31724 :hasFactor _:factor31728 .
+_:factor31728 :hasVar _:var31729 .
+_:var31729 :hasName "X"^^xsd:string .
+_:var31729 :hasSubscript _:sub31730 .
+_:sub31730 rdf:type :subscript .
+_:sub31730 :hasExpression "1"^^xsd:integer .
+
+_:term31724 :hasFactor _:factor31728 .
+_:factor31728 :hasPosition "2"^^xsd:integer .
+_:term31724 rdf:type :term .
+_:term31724 :hasPosition "2"^^xsd:integer .

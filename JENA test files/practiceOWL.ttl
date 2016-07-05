@@ -1,0 +1,1161 @@
+﻿@prefix : <http://modelmeth.nist.gov/manufacturing#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/1.1/schema/qudt#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://modelmeth.nist.gov/manufacturing> a owl:Ontology ;
+	owl:imports <http://model-meth.nist.gov/1.1/schema/qudt> , <http://model-meth.nist.gov/1.2/schema/vaem> , <http://model-meth.nist.gov/1.0/schema/dtype> .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled
+
+<http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> a owl:AnnotationProperty .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Datatypes
+# #
+# #################################################################
+# 
+# 
+# http://modelmeth.nist.gov/manufacturing#characteristicObjectiveType
+
+:characteristicObjectiveType a rdfs:Datatype ;
+	owl:equivalentClass _:genid1 .
+
+_:genid1 a rdfs:Datatype ;
+	owl:oneOf _:genid5 .
+
+_:genid5 a rdf:List ;
+	rdf:first "avoided_characteristic"^^xsd:NMTOKEN ;
+	rdf:rest _:genid4 .
+
+_:genid4 a rdf:List ;
+	rdf:first "sought_characteristic"^^xsd:NMTOKEN ;
+	rdf:rest rdf:nil .
+
+:processCharacteristicObjectiveType a rdfs:Datatype ;
+	owl:equivalentClass _:genid6 .
+
+_:genid6 a rdfs:Datatype ;
+	owl:oneOf _:genid10 .
+
+_:genid10 a rdf:List ;
+	rdf:first "avoided_processCharacteristic"^^xsd:NMTOKEN ;
+	rdf:rest _:genid9 .
+
+_:genid9 a rdf:List ;
+	rdf:first "sought_processCharacteristic"^^xsd:NMTOKEN ;
+	rdf:rest rdf:nil .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# http://modelmeth.nist.gov/manufacturing#hasCost
+
+:hasCost a owl:ObjectProperty ;
+	rdfs:domain :Resource .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasDuration
+
+:hasDuration a owl:ObjectProperty ;
+	rdfs:domain :Process .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasFeedRate
+
+:hasFeedRate a owl:ObjectProperty , owl:FunctionalProperty ;
+	rdfs:domain :MachiningProcess ;
+	rdfs:range :CuttingFeedRate .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasFinishedPart
+
+:hasFinishedPart a owl:ObjectProperty ;
+	owl:inverseOf :hasWorkpiece ;
+	a owl:FunctionalProperty , owl:AsymmetricProperty ;
+	rdfs:domain :Workpiece ;
+	rdfs:range :FinishedPart .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasMaterial
+
+:hasMaterial a owl:ObjectProperty ;
+	rdfs:range :CuttingToolMaterial , :Material .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasProcessContext
+
+:hasProcessContext a owl:ObjectProperty ;
+	rdfs:domain :ProcessCharacteristic ;
+	rdfs:range :Process .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasQuantityKind
+
+:hasQuantityKind a owl:ObjectProperty ;
+	rdfs:domain :ModelProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasStatus
+
+:hasStatus a owl:ObjectProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasUnits
+
+:hasUnits a owl:ObjectProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasValue
+
+:hasValue a owl:ObjectProperty , owl:AsymmetricProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#hasWorkpiece
+
+:hasWorkpiece a owl:ObjectProperty , owl:InverseFunctionalProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#isDirectlyProportionalTo
+
+:isDirectlyProportionalTo a owl:ObjectProperty , owl:SymmetricProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#isInverselyProportionalTo
+
+:isInverselyProportionalTo a owl:ObjectProperty , owl:SymmetricProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#referencesEquation
+
+:referencesEquation a owl:ObjectProperty , owl:AsymmetricProperty , owl:IrreflexiveProperty ;
+	rdfs:domain :Model ;
+	rdfs:range :Equation .
+# 
+# http://modelmeth.nist.gov/manufacturing#referencesProperty
+
+:referencesProperty a owl:ObjectProperty , owl:AsymmetricProperty , owl:IrreflexiveProperty ;
+	rdfs:domain :Model ;
+	rdfs:range :ModelProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#representsProperty
+
+:representsProperty a owl:ObjectProperty ;
+	rdfs:subPropertyOf owl:topObjectProperty ;
+	a owl:AsymmetricProperty , owl:IrreflexiveProperty ;
+	rdfs:domain :Symbol ;
+	rdfs:range :ModelProperty .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# http://modelmeth.nist.gov/manufacturing#hasObjectiveType
+
+:hasObjectiveType a owl:DatatypeProperty , owl:FunctionalProperty ;
+	rdfs:domain :ProcessCharacteristic ;
+	rdfs:range :characteristicObjectiveType .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# http://modelmeth.nist.gov/manufacturing#Abstract
+
+:Abstract a owl:Class ;
+	rdfs:comment "Aspect with neither a spatial nor a temporal location" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Alloy
+
+:Alloy a owl:Class ;
+	rdfs:subClassOf :Material ;
+	rdfs:comment "Material composed of multiple metals or metals and other elements" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Boring
+
+:Boring a owl:Class ;
+	rdfs:subClassOf :SinglePointCutting .
+# 
+# http://modelmeth.nist.gov/manufacturing#ContinuousCost
+
+:ContinuousCost a owl:Class ;
+	rdfs:subClassOf :Cost ;
+	rdfs:comment "Cost that is constantly accrued during the manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Cost
+
+:Cost a owl:Class ;
+	rdfs:subClassOf :Abstract ;
+	rdfs:comment "Monetary value of an aspect of the smart manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingFeedRate
+
+:CuttingFeedRate a owl:Class ;
+	rdfs:subClassOf :MachiningProcessParameter ;
+	rdfs:comment "Speed with which a part moves through a machine" .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingFluid
+
+:CuttingFluid a owl:Class ;
+	rdfs:subClassOf :MachiningProcessParameter ;
+	rdfs:comment "Coolant and lubricant designed for manufacturing processes" .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingForce
+
+:CuttingForce a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "Force needed to complete manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingInsert
+
+:CuttingInsert a owl:Class ;
+	rdfs:subClassOf :Equipment ;
+	rdfs:comment "Removable, replaceable equipment piece that performs cutting operation" .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingSpeed
+
+:CuttingSpeed a owl:Class ;
+	rdfs:subClassOf :MachiningProcessParameter ;
+	rdfs:comment "Speed with which a workpiece is cut by the machine" .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingTool
+
+:CuttingTool a owl:Class ;
+	rdfs:subClassOf :Equipment .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingToolMaterial
+
+:CuttingToolMaterial a owl:Class ;
+	rdfs:subClassOf :CuttingTool .
+# 
+# http://modelmeth.nist.gov/manufacturing#DepthOfCut
+
+:DepthOfCut a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "Measure of the magnitude of the subtractive process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#DiscreteCost
+
+:DiscreteCost a owl:Class ;
+	rdfs:subClassOf :Cost ;
+	rdfs:comment "Cost incurred a finite number of times during a manufacturing cycle" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Drift
+
+:Drift a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "Machine inaccuracy acquired over time and multiple repetitions of the manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Drilling
+
+:Drilling a owl:Class ;
+	rdfs:subClassOf :MultiPointCutting .
+# 
+# http://modelmeth.nist.gov/manufacturing#Equation
+
+:Equation a owl:Class ;
+	rdfs:subClassOf :ModelAbstraction ;
+	rdfs:comment "Function describing the relation between ModelProperties" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Equipment
+
+:Equipment a owl:Class ;
+	rdfs:subClassOf :Resource ;
+	rdfs:comment "Machine(s) used to turn workpiece into finished part" .
+# 
+# http://modelmeth.nist.gov/manufacturing#EquipmentCharacteristic
+
+:EquipmentCharacteristic a owl:Class ;
+	rdfs:subClassOf :Physical ;
+	rdfs:comment "Equipment aspect that contributes to the manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Facing
+
+:Facing a owl:Class ;
+	rdfs:subClassOf :Turning ;
+	owl:disjointWith :Turning ;
+	rdfs:comment "A subtractive manufacturing process in which the part is rotated and a single point cutting tool is moved perpendicular to the axis of rotation." .
+# 
+# http://modelmeth.nist.gov/manufacturing#FinalDimension
+
+:FinalDimension a owl:Class ;
+	rdfs:subClassOf :WorkpieceCharacteristic .
+# 
+# http://modelmeth.nist.gov/manufacturing#FinishedPart
+
+:FinishedPart a owl:Class ;
+	rdfs:subClassOf :Physical ;
+	rdfs:comment "A manufactured item ready for use by the customer, or to be included in an assembly." .
+# 
+# http://modelmeth.nist.gov/manufacturing#Fixture
+
+:Fixture a owl:Class ;
+	rdfs:subClassOf :Equipment .
+# 
+# http://modelmeth.nist.gov/manufacturing#Grinding
+
+:Grinding a owl:Class ;
+	rdfs:subClassOf :MultiPointCutting .
+# 
+# http://modelmeth.nist.gov/manufacturing#InitialDimension
+
+:InitialDimension a owl:Class ;
+	rdfs:subClassOf :WorkpieceCharacteristic .
+# 
+# http://modelmeth.nist.gov/manufacturing#Labor
+
+:Labor a owl:Class ;
+	rdfs:subClassOf :Resource ;
+	rdfs:comment "Personnel responsible for setup and overview of smart manufaturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#LaborCost
+
+:LaborCost a owl:Class ;
+	rdfs:subClassOf :ContinuousCost ;
+	rdfs:comment "Cost of hiring personnel to perform tasks and oversee the process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachineBed
+
+:MachineBed a owl:Class ;
+	rdfs:subClassOf :MachineCharacteristic .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachineCharacteristic
+
+:MachineCharacteristic a owl:Class ;
+	rdfs:subClassOf :EquipmentCharacteristic ;
+	rdfs:comment "Machine aspect that contributes to the manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachinePower
+
+:MachinePower a owl:Class ;
+	rdfs:subClassOf :MachineCharacteristic .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachineSpindle
+
+:MachineSpindle a owl:Class ;
+	rdfs:subClassOf :MachineCharacteristic .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachineTool
+
+:MachineTool a owl:Class ;
+	rdfs:subClassOf :Equipment .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachineToolChanger
+
+:MachineToolChanger a owl:Class ;
+	rdfs:subClassOf :MachineCharacteristic .
+# 
+# http://modelmeth.nist.gov/manufacturing#Machinery
+
+:Machinery a owl:Class ;
+	rdfs:subClassOf :Resource ;
+	rdfs:comment "Machines needed to produce part" .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachiningProcess
+
+:MachiningProcess a owl:Class ;
+	rdfs:subClassOf :ManufacturingProcess ;
+	rdfs:comment "A subtractive manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#MachiningProcessParameter
+
+:MachiningProcessParameter a owl:Class ;
+	rdfs:subClassOf :ProcessParameter ;
+	rdfs:comment "A controllable characteristic that can be adjusted for different final results" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ManufacturingProcess
+
+:ManufacturingProcess a owl:Class ;
+	rdfs:subClassOf :Process ;
+	rdfs:comment "A process that is part of creating a manufactured artifact" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Material
+
+:Material a owl:Class ;
+	rdfs:subClassOf :Resource ;
+	rdfs:comment "Substance that the Workpiece/FinishedPart is made up of" .
+# 
+# http://modelmeth.nist.gov/manufacturing#MaterialCost
+
+:MaterialCost a owl:Class ;
+	rdfs:subClassOf :DiscreteCost ;
+	rdfs:comment "Cost of material used to make finished part" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Milling
+
+:Milling a owl:Class ;
+	rdfs:subClassOf :MultiPointCutting .
+# 
+# http://modelmeth.nist.gov/manufacturing#Model
+
+:Model a owl:Class ;
+	rdfs:subClassOf :ModelAbstraction ;
+	rdfs:comment "A simulation of a manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ModelAbstraction
+
+:ModelAbstraction a owl:Class ;
+	rdfs:subClassOf :Abstract ;
+	rdfs:comment "A conceptualization of a manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ModelParameter
+
+:ModelParameter a owl:Class ;
+	rdfs:subClassOf :ModelProperty ;
+	rdfs:comment "a ModelProperty whose value can be specified so as to specify a context of the analysis." .
+# 
+# http://modelmeth.nist.gov/manufacturing#ModelProperty
+
+:ModelProperty a owl:Class ;
+	rdfs:subClassOf :ModelAbstraction ;
+	owl:disjointWith :Symbol ;
+	rdfs:comment "A characteristic that affects calculations and decisions made in a specific model" .
+# 
+# http://modelmeth.nist.gov/manufacturing#MultiPointCutting
+
+:MultiPointCutting a owl:Class ;
+	rdfs:subClassOf :MachiningProcess .
+# 
+# http://modelmeth.nist.gov/manufacturing#NumberOfParts
+
+:NumberOfParts a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "The limit of the number of finished parts able to be made without replacing/repairing a machine aspect" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ObjectiveFunction
+
+:ObjectiveFunction a owl:Class ;
+	rdfs:subClassOf :Equation ;
+	rdfs:comment "The function that describes the objective to be accomplished" .
+# 
+# http://modelmeth.nist.gov/manufacturing#OperationCost
+
+:OperationCost a owl:Class ;
+	rdfs:subClassOf :ContinuousCost ;
+	rdfs:comment "Cost to keep machines operating during the manufacturing cycle" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Physical
+
+:Physical a owl:Class ;
+	rdfs:comment "Aspect that has a spatial or temporal location" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Planing
+
+:Planing a owl:Class ;
+	rdfs:subClassOf :SinglePointCutting .
+# 
+# http://modelmeth.nist.gov/manufacturing#Process
+
+:Process a owl:Class ;
+	rdfs:subClassOf :Physical ;
+	rdfs:comment "Description of the manufacturing taking place to produce the finished part" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ProcessCharacteristic
+
+:ProcessCharacteristic a owl:Class ;
+	rdfs:subClassOf :Physical ;
+	rdfs:comment "A property describing a manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ProcessParameter
+
+:ProcessParameter a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "A controllable characteristics of a manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ProcessingTime
+
+:ProcessingTime a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "Duration of the entire process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#RepairOrReplacementCost
+
+:RepairOrReplacementCost a owl:Class ;
+	rdfs:subClassOf :DiscreteCost ;
+	rdfs:comment "Cost of repairing/replacing worn equipment" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Resource
+
+:Resource a owl:Class ;
+	rdfs:subClassOf :Physical ;
+	rdfs:comment "People or items that are necessary for the production of a finished part" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Shaping
+
+:Shaping a owl:Class ;
+	rdfs:subClassOf :SinglePointCutting .
+# 
+# http://modelmeth.nist.gov/manufacturing#SinglePointCutting
+
+:SinglePointCutting a owl:Class ;
+	rdfs:subClassOf :MachiningProcess ;
+	rdfs:comment "A subtractive manufacturing process using a single point of contact to remove material" .
+# 
+# http://modelmeth.nist.gov/manufacturing#SurfaceRoughness
+
+:SurfaceRoughness a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "The quality of the finish on a workpiece" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Symbol
+
+:Symbol a owl:Class ;
+	rdfs:subClassOf :ModelAbstraction ;
+	rdfs:comment "A representation of a ModelProperty" .
+# 
+# http://modelmeth.nist.gov/manufacturing#TimePerPart
+
+:TimePerPart a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "Length of time necessary for one Workpiece to be made into a FinishedPart" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ToolWear
+
+:ToolWear a owl:Class ;
+	rdfs:subClassOf :ProcessCharacteristic ;
+	rdfs:comment "Damage done to a machine tool due to the manufacturing process" .
+# 
+# http://modelmeth.nist.gov/manufacturing#Turning
+
+:Turning a owl:Class ;
+	rdfs:subClassOf :SinglePointCutting ;
+	rdfs:comment "A subtractive manufacturing process in which the part is rotated and a single point cutting tool is moved parallel to the axis of rotation." .
+# 
+# http://modelmeth.nist.gov/manufacturing#Workpiece
+
+:Workpiece a owl:Class ;
+	rdfs:subClassOf :Physical ;
+	rdfs:comment "Something that is in the process of being transformed to a finished part." .
+# 
+# http://modelmeth.nist.gov/manufacturing#WorkpieceCharacteristic
+
+:WorkpieceCharacteristic a owl:Class ;
+	rdfs:subClassOf :Workpiece ;
+	rdfs:comment "Aspect of the Workpiece" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Individuals
+# #
+# #################################################################
+# 
+# 
+# http://modelmeth.nist.gov/manufacturing#Aluminum
+
+:Aluminum a owl:NamedIndividual , :Alloy .
+# 
+# http://modelmeth.nist.gov/manufacturing#C_g
+
+:C_g a owl:NamedIndividual , :RepairOrReplacementCost ;
+	:hasQuantityKind qudt:FinancialUnit ;
+	rdfs:comment "Regrinding cost" .
+# 
+# http://modelmeth.nist.gov/manufacturing#C_h
+
+:C_h a owl:NamedIndividual , :LaborCost ;
+	:hasQuantityKind qudt:FinancialUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#C_w
+
+:C_w a owl:NamedIndividual , :LaborCost ;
+	:hasQuantityKind qudt:FinancialUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#C_z
+
+:C_z a owl:NamedIndividual , :OperationCost ;
+	:hasQuantityKind qudt:FinancialUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#CarbonToolSteel
+
+:CarbonToolSteel a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#CastCobaltAlloy
+
+:CastCobaltAlloy a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#CastIron
+
+:CastIron a owl:NamedIndividual , :Alloy .
+# 
+# http://modelmeth.nist.gov/manufacturing#CementedCarbide
+
+:CementedCarbide a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#Ceramic
+
+:Ceramic a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#Cermet
+
+:Cermet a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#CubicBoronNitride
+
+:CubicBoronNitride a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#CuttingForceEquation
+
+:CuttingForceEquation a owl:NamedIndividual , :Equation ;
+	rdfs:comment "F_i=k_c*V^(α_c)*f^(β_c)*d_i^(γ_c)*(tw,i+t)^σ_c" .
+# 
+# http://modelmeth.nist.gov/manufacturing#D
+
+:D a owl:NamedIndividual , :Symbol ;
+	:representsProperty :FinalRadius .
+# 
+# http://modelmeth.nist.gov/manufacturing#DC
+
+:DC a owl:NamedIndividual , :Cost ;
+	:hasQuantityKind qudt:FinancialUnit ;
+	:isInverselyProportionalTo :P ;
+	:referencesEquation :DirectCostEquation ;
+	:hasObjectiveType "avoided_characteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#D_0
+
+:D_0 a owl:NamedIndividual , :Symbol ;
+	:representsProperty :InitialRadius .
+# 
+# http://modelmeth.nist.gov/manufacturing#Desirable
+
+:Desirable a owl:NamedIndividual .
+# 
+# http://modelmeth.nist.gov/manufacturing#Diamond
+
+:Diamond a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#DirectCostEquation
+
+:DirectCostEquation a owl:NamedIndividual , :Equation ;
+	rdfs:comment "DC=N*C_h*t_h+(C_w+C_z)*T_N" .
+# 
+# http://modelmeth.nist.gov/manufacturing#E
+
+:E a owl:NamedIndividual , :Cost ;
+	:hasQuantityKind qudt:FinancialUnit ;
+	:isDirectlyProportionalTo :P ;
+	:hasObjectiveType "sought_characteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#F
+
+:F a owl:NamedIndividual , :CuttingForce , :Symbol ;
+	:hasProcessContext :facing-1 , :turning-1 ;
+	:hasUnits qudt:Newton ;
+	:representsProperty :cuttingForce .
+# 
+# http://modelmeth.nist.gov/manufacturing#FinalLength
+
+:FinalLength a owl:NamedIndividual , :FinalDimension ;
+	:hasUnits qudt:Meter .
+# 
+# http://modelmeth.nist.gov/manufacturing#FinalRadius
+
+:FinalRadius a owl:NamedIndividual , :FinalDimension , :ModelProperty ;
+	:hasUnits qudt:Millimeter ;
+	:isInverselyProportionalTo :d_i .
+# 
+# http://modelmeth.nist.gov/manufacturing#FinalThickness
+
+:FinalThickness a owl:NamedIndividual , :FinalDimension ;
+	:hasUnits qudt:Meter ;
+	:isInverselyProportionalTo :d_i .
+# 
+# http://modelmeth.nist.gov/manufacturing#HSSCobalt
+
+:HSSCobalt a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#HighSpeedSteel
+
+:HighSpeedSteel a owl:NamedIndividual , :CuttingToolMaterial .
+# 
+# http://modelmeth.nist.gov/manufacturing#InitialLength
+
+:InitialLength a owl:NamedIndividual , :InitialDimension ;
+	:hasUnits qudt:Meter .
+# 
+# http://modelmeth.nist.gov/manufacturing#InitialRadius
+
+:InitialRadius a owl:NamedIndividual , :InitialDimension , :ModelProperty ;
+	:hasUnits qudt:Millimeter .
+# 
+# http://modelmeth.nist.gov/manufacturing#InitialThickness
+
+:InitialThickness a owl:NamedIndividual , :InitialDimension ;
+	:hasUnits qudt:Meter .
+# 
+# http://modelmeth.nist.gov/manufacturing#LoadingUnloading
+
+:LoadingUnloading a owl:NamedIndividual , :Labor .
+# 
+# http://modelmeth.nist.gov/manufacturing#MC
+
+:MC a owl:NamedIndividual , :MaterialCost ;
+	:hasQuantityKind qudt:FinancialUnit ;
+	:isDirectlyProportionalTo :DC .
+# 
+# http://modelmeth.nist.gov/manufacturing#ManningMachine
+
+:ManningMachine a owl:NamedIndividual , :Labor .
+# 
+# http://modelmeth.nist.gov/manufacturing#MildSteel
+
+:MildSteel a owl:NamedIndividual , :Alloy .
+# 
+# http://modelmeth.nist.gov/manufacturing#N
+
+:N a owl:NamedIndividual , :NumberOfParts , :Symbol ;
+	:isDirectlyProportionalTo :DC , :E , :Z ;
+	:representsProperty :toolRegrindScenario ;
+	rdfs:comment "Number of parts made before regrind" .
+# 
+# http://modelmeth.nist.gov/manufacturing#P
+
+:P a owl:NamedIndividual , :Cost ;
+	:hasQuantityKind qudt:FinancialUnit ;
+	:isDirectlyProportionalTo :Z ;
+	:referencesEquation :ProfitEquation ;
+	:hasObjectiveType "sought_characteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ProcessingTimeEquation
+
+:ProcessingTimeEquation a owl:NamedIndividual , :Equation ;
+	rdfs:comment """T_N=∑ t_c,i 
+
+∑ from i=1 to i=n
+
+t_c,i=(πD_i¯L)/(1000Vf)""" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ProfitEquation
+
+:ProfitEquation a owl:NamedIndividual , :Equation ;
+	rdfs:comment "P=E−(DC+GC+QC)" .
+# 
+# http://modelmeth.nist.gov/manufacturing#QC
+
+:QC a owl:NamedIndividual , :Cost ;
+	:hasQuantityKind qudt:FinancialUnit ;
+	:isInverselyProportionalTo :P ;
+	:referencesEquation :QualityCostEquation ;
+	:hasObjectiveType "avoided_characteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#QualityCostEquation
+
+:QualityCostEquation a owl:NamedIndividual , :Equation ;
+	rdfs:comment """QC=∑ℓ_d(∫(2δ_i−Δ_i)2dt)+∑ℓ_r(∫(Φ_i−R)2dt)
+
+∑ from i = 1 to i = n
+∫ between T_(i-1) and T_i""" .
+# 
+# http://modelmeth.nist.gov/manufacturing#R
+
+:R a owl:NamedIndividual , :Symbol ;
+	:representsProperty :targetSurfaceRoughness .
+# 
+# http://modelmeth.nist.gov/manufacturing#RC
+
+:RC a owl:NamedIndividual , :RepairOrReplacementCost ;
+	:hasQuantityKind qudt:FinancialUnit ;
+	:isInverselyProportionalTo :P ;
+	:hasObjectiveType "avoided_characteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#StainlessSteel
+
+:StainlessSteel a owl:NamedIndividual , :Alloy .
+# 
+# http://modelmeth.nist.gov/manufacturing#SurfaceRoughnessEquation
+
+:SurfaceRoughnessEquation a owl:NamedIndividual , :Equation ;
+	rdfs:comment "Φ_i=k_r*V^(α_r)*f^(β_r)*d_i^(γ_r)*(tw,i+t)^σ_r" .
+# 
+# http://modelmeth.nist.gov/manufacturing#T_N
+
+:T_N a owl:NamedIndividual , :ProcessingTime ;
+	:hasUnits qudt:MinuteTime ;
+	:isDirectlyProportionalTo :DC , :Z , :t_c ;
+	:hasObjectiveType "avoided_processCharacteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#ToolWearEquation
+
+:ToolWearEquation a owl:NamedIndividual , :Equation ;
+	rdfs:comment "w_i=k_w*V^(α_w)*f^(β_w)*d_i^(γ_w)*(tw,i+t)^(σ_w)" .
+# 
+# http://modelmeth.nist.gov/manufacturing#TurningOptimization
+
+:TurningOptimization a owl:NamedIndividual , :Model ;
+	:hasStatus :Undesirable ;
+	:hasUnits qudt:Minute_Time .
+
+qudt:Minute_Time a owl:NamedIndividual .
+
+:TurningOptimization :isDirectlyProportionalTo :DC , :Z , :t_c ;
+	:referencesEquation :CuttingForceEquation , :DirectCostEquation , :ProcessingTimeEquation , :ProfitEquation , :QualityCostEquation , :SurfaceRoughnessEquation , :ToolWearEquation .
+# 
+# http://modelmeth.nist.gov/manufacturing#Undesirable
+
+:Undesirable a owl:NamedIndividual .
+# 
+# http://modelmeth.nist.gov/manufacturing#V
+
+:V a owl:NamedIndividual , :CuttingSpeed , :Symbol ;
+	:hasProcessContext :facing-1 , :turning-1 ;
+	:hasUnits qudt:MeterPerMinute ;
+	:isDirectlyProportionalTo :F , :phi ;
+	:isInverselyProportionalTo :t_c ;
+	:representsProperty :cuttingSpeed .
+# 
+# http://modelmeth.nist.gov/manufacturing#W_hat
+
+:W_hat a owl:NamedIndividual , :Symbol ;
+	:representsProperty :maxToolWear .
+# 
+# http://modelmeth.nist.gov/manufacturing#W_i
+
+:W_i a owl:NamedIndividual , :Symbol ;
+	:representsProperty :toolwear-1 .
+# 
+# http://modelmeth.nist.gov/manufacturing#Z
+
+:Z a owl:NamedIndividual , :ObjectiveFunction ;
+	:hasObjectiveType "sought_characteristic" ;
+	rdfs:comment "Z=P/(N*t_h+T_N)" .
+	
+:beta_1 a owl:NamedIndividual ;
+	:hasUnits :Length .
+	
+:X_1 a owl:NamedIndividual ;
+	:hasUnits :Length .
+	
+:Y a owl:NamedIndividual ;
+	:hasUnits :Area .
+	
+:m_1 a owl:NamedIndividual ;
+	:hasUnits :Mass .
+	
+:v_1 a owl:NamedIndividual ;
+	:hasUnits :LinearVelocity .
+	
+:KE a owl:NamedIndividual ;
+	:hasUnits :EnergyAndWork .
+	
+# 
+# http://modelmeth.nist.gov/manufacturing#cutting-insert-1
+
+:cutting-insert-1 a owl:NamedIndividual , :CuttingInsert ;
+	:hasCost :RC ;
+	:hasProcessContext :turning-1 .
+# 
+# http://modelmeth.nist.gov/manufacturing#cuttingForce
+
+:cuttingForce a owl:NamedIndividual , :ModelProperty ;
+	:hasQuantityKind qudt:ForceUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#cuttingSpeed
+
+:cuttingSpeed a owl:NamedIndividual , :ModelParameter ;
+	:hasQuantityKind qudt:SpaceAndTimeUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#d_i
+
+:d_i a owl:NamedIndividual , :DepthOfCut , :Symbol ;
+	:hasProcessContext :facing-1 , :turning-1 ;
+	:hasUnits qudt:Millimeter ;
+	:isDirectlyProportionalTo :F , :phi ;
+	:representsProperty :depthOfCut .
+# 
+# http://modelmeth.nist.gov/manufacturing#delta
+
+:delta a owl:NamedIndividual , :Drift , :Symbol ;
+	:hasProcessContext :facing-1 , :turning-1 ;
+	:isInverselyProportionalTo :QC ;
+	:representsProperty :diameterDrift .
+# 
+# http://modelmeth.nist.gov/manufacturing#depthOfCut
+
+:depthOfCut a owl:NamedIndividual , :ModelProperty ;
+	:hasQuantityKind qudt:LengthUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#diameterDrift
+
+:diameterDrift a owl:NamedIndividual , :ModelProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#f
+
+:f a owl:NamedIndividual , :CuttingFeedRate , :Symbol ;
+	:hasProcessContext :facing-1 , :turning-1 ;
+	:isDirectlyProportionalTo :F , :phi ;
+	:isInverselyProportionalTo :t_c ;
+	:representsProperty :feedRate .
+# 
+# http://modelmeth.nist.gov/manufacturing#facing-1
+
+:facing-1 a owl:NamedIndividual , :Facing ;
+	:hasDuration :T_N ;
+	:hasFeedRate :f .
+# 
+# http://modelmeth.nist.gov/manufacturing#feedRate
+
+:feedRate a owl:NamedIndividual , :ModelParameter ;
+	:hasQuantityKind qudt:SpaceAndTimeUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#maxToolWear
+
+:maxToolWear a owl:NamedIndividual , :ModelProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#phi
+
+:phi a owl:NamedIndividual , :SurfaceRoughness , :Symbol ;
+	:hasProcessContext :facing-1 , :turning-1 ;
+	:isDirectlyProportionalTo :QC ;
+	:representsProperty :surfaceRoughness ;
+	:hasObjectiveType "avoided_processCharacteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#surfaceRoughness
+
+:surfaceRoughness a owl:NamedIndividual , :ModelProperty ;
+	:hasQuantityKind qudt:DimensionlessUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#t_c
+
+:t_c a owl:NamedIndividual , :TimePerPart ;
+	:hasUnits qudt:MinuteTime ;
+	:isDirectlyProportionalTo :F , :phi ;
+	:hasObjectiveType "avoided_processCharacteristic" .
+# 
+# http://modelmeth.nist.gov/manufacturing#targetSurfaceRoughness
+
+:targetSurfaceRoughness a owl:NamedIndividual , :ModelProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#toolRegrindScenario
+
+:toolRegrindScenario a owl:NamedIndividual , :ModelParameter ;
+	:hasQuantityKind qudt:DimensionlessUnit .
+# 
+# http://modelmeth.nist.gov/manufacturing#toolwear-1
+
+:toolwear-1 a owl:NamedIndividual , :ModelProperty , :ToolWear ;
+	:hasProcessContext :facing-1 , :turning-1 ;
+	:hasQuantityKind qudt:DimensionlessUnit ;
+	rdfs:comment "POD temporary" .
+
+_:genid11 a owl:Axiom ;
+	owl:annotatedSource :toolwear-1 ;
+	owl:annotatedProperty :hasProcessContext ;
+	owl:annotatedTarget :turning-1 ;
+	rdfs:comment "POD Temporary" .
+# 
+# http://modelmeth.nist.gov/manufacturing#toolwearCompensation
+
+:toolwearCompensation a owl:NamedIndividual , :ModelProperty .
+# 
+# http://modelmeth.nist.gov/manufacturing#turning-1
+
+:turning-1 a owl:NamedIndividual , :Turning ;
+	:hasCost :C_h , :C_w , :C_z , :MC , :RC ;
+	:hasDuration :T_N ;
+	:hasFeedRate :f ;
+	:hasProcessContext :turning-1 ;
+	:referencesProperty :FinalRadius , :InitialRadius , :cuttingForce , :cuttingSpeed , :depthOfCut , :diameterDrift , :feedRate , :maxToolWear , :surfaceRoughness , :targetSurfaceRoughness , :toolRegrindScenario , :toolwear-1 ;
+	rdfs:comment "POD Temporary" .
+# 
+# http://qudt.org/1.1/schema/qudt#DimensionlessUnit
+
+qudt:DimensionlessUnit a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#FinancialUnit
+
+qudt:FinancialUnit a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#ForceUnit
+
+qudt:ForceUnit a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#LengthUnit
+
+qudt:LengthUnit a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#Meter
+
+qudt:Meter a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#MeterPerMinute
+
+qudt:MeterPerMinute a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#Millimeter
+
+qudt:Millimeter a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#MinuteTime
+
+qudt:MinuteTime a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#Minute_Time
+# 
+# http://qudt.org/1.1/schema/qudt#Newton
+
+qudt:Newton a owl:NamedIndividual .
+# 
+# http://qudt.org/1.1/schema/qudt#SpaceAndTimeUnit
+
+qudt:SpaceAndTimeUnit a owl:NamedIndividual .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    General axioms
+# #
+# #################################################################
+# 
+# 
+
+_:genid12 a owl:AllDifferent ;
+	owl:distinctMembers _:genid14 .
+
+_:genid14 a rdf:List ;
+	rdf:first :Aluminum ;
+	rdf:rest _:genid13 .
+
+_:genid13 a rdf:List ;
+	rdf:first :CastIron ;
+	rdf:rest rdf:nil .
+# 
+
+_:genid15 a owl:AllDifferent ;
+	owl:distinctMembers _:genid17 .
+
+_:genid17 a rdf:List ;
+	rdf:first :Aluminum ;
+	rdf:rest _:genid16 .
+
+_:genid16 a rdf:List ;
+	rdf:first :MildSteel ;
+	rdf:rest rdf:nil .
+# 
+
+_:genid18 a owl:AllDifferent ;
+	owl:distinctMembers _:genid20 .
+
+_:genid20 a rdf:List ;
+	rdf:first :Aluminum ;
+	rdf:rest _:genid19 .
+
+_:genid19 a rdf:List ;
+	rdf:first :StainlessSteel ;
+	rdf:rest rdf:nil .
+# 
+
+_:genid21 a owl:AllDifferent ;
+	owl:distinctMembers _:genid23 .
+
+_:genid23 a rdf:List ;
+	rdf:first :CastIron ;
+	rdf:rest _:genid22 .
+
+_:genid22 a rdf:List ;
+	rdf:first :MildSteel ;
+	rdf:rest rdf:nil .
+# 
+
+_:genid24 a owl:AllDifferent ;
+	owl:distinctMembers _:genid26 .
+
+_:genid26 a rdf:List ;
+	rdf:first :CastIron ;
+	rdf:rest _:genid25 .
+
+_:genid25 a rdf:List ;
+	rdf:first :StainlessSteel ;
+	rdf:rest rdf:nil .
+# 
+
+_:genid27 a owl:AllDifferent ;
+	owl:distinctMembers _:genid29 .
+
+_:genid29 a rdf:List ;
+	rdf:first :MildSteel ;
+	rdf:rest _:genid28 .
+
+_:genid28 a rdf:List ;
+	rdf:first :StainlessSteel ;
+	rdf:rest rdf:nil .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Rules
+# #
+# #################################################################
+# 
+# 
+
+:tw a <http://www.w3.org/2003/11/swrl#Variable> .
+
+:m a <http://www.w3.org/2003/11/swrl#Variable> .
+
+_:genid30 <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
+	rdfs:comment "Tool wear is to be avoided in machining processes."^^xsd:string ;
+	rdfs:label "Def-AvoidToolWearInMachining"^^xsd:string ;
+	a <http://www.w3.org/2003/11/swrl#Imp> ;
+	<http://www.w3.org/2003/11/swrl#body> _:genid35 .
+
+_:genid35 a <http://www.w3.org/2003/11/swrl#AtomList> ;
+	rdf:first _:genid36 .
+
+_:genid36 a <http://www.w3.org/2003/11/swrl#ClassAtom> ;
+	<http://www.w3.org/2003/11/swrl#classPredicate> :ToolWear ;
+	<http://www.w3.org/2003/11/swrl#argument1> :tw .
+
+_:genid35 rdf:rest _:genid33 .
+
+_:genid33 a <http://www.w3.org/2003/11/swrl#AtomList> ;
+	rdf:first _:genid34 .
+
+_:genid34 a <http://www.w3.org/2003/11/swrl#ClassAtom> ;
+	<http://www.w3.org/2003/11/swrl#classPredicate> :MachiningProcess ;
+	<http://www.w3.org/2003/11/swrl#argument1> :m .
+
+_:genid33 rdf:rest _:genid31 .
+
+_:genid31 a <http://www.w3.org/2003/11/swrl#AtomList> ;
+	rdf:first _:genid32 .
+
+_:genid32 a <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+	<http://www.w3.org/2003/11/swrl#propertyPredicate> :hasProcessContext ;
+	<http://www.w3.org/2003/11/swrl#argument1> :tw ;
+	<http://www.w3.org/2003/11/swrl#argument2> :m .
+
+_:genid31 rdf:rest rdf:nil .
+
+_:genid30 <http://www.w3.org/2003/11/swrl#head> _:genid37 .
+
+_:genid37 a <http://www.w3.org/2003/11/swrl#AtomList> ;
+	rdf:first _:genid38 .
+
+_:genid38 a <http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom> ;
+	<http://www.w3.org/2003/11/swrl#propertyPredicate> :hasObjectiveType ;
+	<http://www.w3.org/2003/11/swrl#argument1> :tw ;
+	<http://www.w3.org/2003/11/swrl#argument2> "avoided_characteristic"^^xsd:NMTOKEN .
+
+_:genid37 rdf:rest rdf:nil .
+# Generated by the OWL API (version 4.2.5.20160517-0735) https://github.com/owlcs/owlapi

@@ -1,0 +1,61 @@
+@prefix mfi: <http://modelmeth.nist.gov/manufacturing#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+mfi:realURI  a               mfi:relation ;
+        mfi:hasLHS           [ mfi:hasTerm  [ a                mfi:term ;
+                                              mfi:hasFactor    [ mfi:hasPosition  1 ;
+                                                                 mfi:hasVar       [ mfi:hasName  "Y"^^xsd:string ]
+                                                               ] ;
+                                              mfi:hasPosition  1
+                                            ] ] ;
+        mfi:hasRHS           [ mfi:hasTerm  [ a                mfi:term ;
+                                              mfi:hasFactor    [ mfi:hasPosition  2 ;
+                                                                 mfi:hasVar       [ mfi:hasName       "X"^^xsd:string ;
+                                                                                    mfi:hasSubscript  [ a                  mfi:subscript ;
+                                                                                                        mfi:hasExpression  "1"^^xsd:integer
+                                                                                                      ]
+                                                                                  ]
+                                                               ] ;
+                                              mfi:hasFactor    [ mfi:hasPosition  1 ;
+                                                                 mfi:hasVar       [ mfi:hasName       "beta"^^xsd:string ;
+                                                                                    mfi:hasSubscript  [ a                  mfi:subscript ;
+                                                                                                        mfi:hasExpression  "1"^^xsd:integer
+                                                                                                      ]
+                                                                                  ]
+                                                               ] ;
+                                              mfi:hasPosition  2
+                                            ] ] ;
+        mfi:hasRelationalOp  mfi:equal .
+		
+mfi:realURI2  a               mfi:relation ;
+        mfi:hasLHS           [ mfi:hasTerm  [ a                mfi:term ;
+                                              mfi:hasFactor    [ mfi:hasPosition  1 ;
+                                                                 mfi:hasVar       [ mfi:hasName  "KE"^^xsd:string ]
+                                                               ] ;
+                                              mfi:hasPosition  1
+                                            ] ] ;
+        mfi:hasRHS           [ mfi:hasTerm  [ a                mfi:term ;
+                                              mfi:hasFactor    [ mfi:hasPosition  2 ;
+                                                                 mfi:hasVar       [ mfi:hasName       "v"^^xsd:string ;
+                                                                                    mfi:hasSubscript  [ a                  mfi:subscript ;
+                                                                                                        mfi:hasExpression  "1"^^xsd:integer
+                                                                                                      ];
+																					mfi:hasSuperscript  [ a                  mfi:superscript ;
+                                                                                                        mfi:hasExpression  "2"^^xsd:integer
+                                                                                                      ]
+
+                                                                                  ]
+                                                               ] ;
+                                              mfi:hasFactor    [ mfi:hasPosition  1 ;
+                                                                 mfi:hasVar       [ mfi:hasName       "m"^^xsd:string ;
+                                                                                    mfi:hasSubscript  [ a                  mfi:subscript ;
+                                                                                                        mfi:hasExpression  "1"^^xsd:integer
+                                                                                                      ]
+                                                                                  ]
+                                                               ] ;
+                                              mfi:hasPosition  2
+                                            ] ] ;
+        mfi:hasRelationalOp  mfi:equal .
+
+
+										

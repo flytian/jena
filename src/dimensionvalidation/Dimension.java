@@ -23,6 +23,7 @@ public interface Dimension {
 	public String getDimensionUnits();
 	public String getVector();
 	public Dimension multiply(Dimension d);
+	public Dimension divide(Dimension d);
 	public boolean equals(Object o);
 	public void setDimensionUnits(String s);
 	

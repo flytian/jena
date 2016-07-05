@@ -217,4 +217,19 @@ public class USDimension implements Dimension{
 		
 		return newDimension;
 	}
+	
+	public Dimension divide(Dimension otherDimension) {
+		USDimension otherCopy = (USDimension) otherDimension;
+		
+		USDimension newDimension = new USDimension();
+		
+		newDimension.setDimensionUnits(dimensionUnits + "/" + otherDimension.getDimensionUnits());		
+		newDimension.setM(M - otherCopy.getM());
+		newDimension.setL(L - otherCopy.getL());
+		newDimension.setT(T - otherCopy.getT());
+		newDimension.setTheta(theta - otherCopy.getTheta());
+		newDimension.setU(U - otherCopy.getU());
+		
+		return newDimension;
+	}
 }

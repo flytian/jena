@@ -245,4 +245,21 @@ public class PlanckDimension implements Dimension{
 		
 		return newDimension;
 	}
+	
+	public Dimension divide(Dimension otherDimension) {
+		PlanckDimension otherCopy = (PlanckDimension) otherDimension;
+		
+		PlanckDimension newDimension = new PlanckDimension();
+		
+		newDimension.setDimensionUnits(dimensionUnits + "/" + otherDimension.getDimensionUnits());
+	
+		newDimension.setM(M - otherCopy.getM());
+		newDimension.setL(L - otherCopy.getL());
+		newDimension.setT(T - otherCopy.getT());
+		newDimension.setTheta(theta - otherCopy.getTheta());
+		newDimension.setQ(Q - otherCopy.getQ());
+		newDimension.setU(U - otherCopy.getU());
+		
+		return newDimension;
+	}
 }

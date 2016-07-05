@@ -7,11 +7,12 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-:C_w    :hasConcept         :Cost ;
+:C_w    :hasConcept         :Cost , :Constant ;
         :hasNumericalValue  0.5 ;
         :hasUnits           :USDollarPerMinute .
 
-:sigma_r  :hasNumericalValue  0.08887 .
+:sigma_r  :hasConcept       :Constant ;
+        :hasNumericalValue  0.08887 .
 
 :KE     a          owl:NamedIndividual ;
         :hasUnits  :EnergyAndWork .
@@ -50,13 +51,14 @@
 
 :MachineBed  a  owl:NamedIndividual , :MachineCharacteristic .
 
-:V_max  :hasConcept         :CuttingSpeed , :MaximumAcceptableValue ;
+:V_max  :hasConcept         :CuttingSpeed , :MaximumAcceptableValue , :Constant ;
         :hasNumericalValue  70.0 ;
         :hasUnits           :MeterPerMinute .
 
 :Diameter  a    owl:NamedIndividual , :PartDimension .
 
-:gamma_r  :hasNumericalValue  0.565 .
+:gamma_r  :hasConcept       :Constant ;
+        :hasNumericalValue  0.565 .
 
 :LinearVelocity  a  owl:NamedIndividual .
 
@@ -72,15 +74,26 @@
                                owl:onProperty     :hasCost
                              ] .
 
+[ a                    owl:AllDifferent ;
+  owl:distinctMembers  [ a          rdf:List ;
+                         rdf:first  :MildSteel ;
+                         rdf:rest   [ a          rdf:List ;
+                                      rdf:first  :StainlessSteel ;
+                                      rdf:rest   ()
+                                    ]
+                       ]
+] .
+
 :Characteristic_Description_5
         a                   owl:NamedIndividual , :Characteristic_Description ;
         :hasProcessContext  :Turning ;
         :hasSymbol          :d_i .
 
-:beta_c  :hasNumericalValue  1.016 .
+:beta_c  :hasConcept        :Constant ;
+        :hasNumericalValue  1.016 .
 
 :W_i    a                    owl:NamedIndividual , :Symbol ;
-        :hasConcept          :ToolWear , :TotalProcessValue ;
+        :hasConcept          :ToolWear , :TotalProcessValue , :CalculatedValue ;
         :representsProperty  :ToolWear .
 
 :MaximumAcceptableValue
@@ -100,6 +113,16 @@
 
 :InitialRadius  a  owl:NamedIndividual , :ModelProperty .
 
+[ a                    owl:AllDifferent ;
+  owl:distinctMembers  [ a          rdf:List ;
+                         rdf:first  :Aluminum ;
+                         rdf:rest   [ a          rdf:List ;
+                                      rdf:first  :MildSteel ;
+                                      rdf:rest   ()
+                                    ]
+                       ]
+] .
+
 :hasQuantityKind  a         owl:ObjectProperty ;
         rdfs:subPropertyOf  owl:topObjectProperty .
 
@@ -118,21 +141,11 @@
                                           ]
                              ] .
 
-[ a                    owl:AllDifferent ;
-  owl:distinctMembers  [ a          rdf:List ;
-                         rdf:first  :Aluminum ;
-                         rdf:rest   [ a          rdf:List ;
-                                      rdf:first  :CastIron ;
-                                      rdf:rest   ()
-                                    ]
-                       ]
-] .
-
-:f_max  :hasConcept         :CuttingFeedRate , :MaximumAcceptableValue ;
+:f_max  :hasConcept         :CuttingFeedRate , :MaximumAcceptableValue , :Constant ;
         :hasNumericalValue  0.28 ;
         :hasUnits           :MillimeterPerRevolution .
 
-:C_z    :hasConcept         :Cost ;
+:C_z    :hasConcept         :Cost , :Constant ;
         :hasNumericalValue  2.0 ;
         :hasUnits           :USDollarPerMinute .
 
@@ -155,16 +168,6 @@
 
 :hasObjectiveType  a  owl:DatatypeProperty , owl:FunctionalProperty .
 
-[ a                    owl:AllDifferent ;
-  owl:distinctMembers  [ a          rdf:List ;
-                         rdf:first  :Aluminum ;
-                         rdf:rest   [ a          rdf:List ;
-                                      rdf:first  :StainlessSteel ;
-                                      rdf:rest   ()
-                                    ]
-                       ]
-] .
-
 qudt:Length  a  owl:NamedIndividual .
 
 :MachineTool  a          owl:Class ;
@@ -173,7 +176,7 @@ qudt:Length  a  owl:NamedIndividual .
 :hasMaterial  a     owl:ObjectProperty ;
         rdfs:range  :CuttingToolMaterial , :Material .
 
-:w_i    :hasConcept  :ToolWear , :IndividualPartValue .
+:w_i    :hasConcept  :ToolWear , :IndividualPartValue , :CalculatedValue .
 
 :RegressionEquation  a   owl:Class ;
         rdfs:comment     "Equation derived from observed interactions between process characteristics" ;
@@ -182,16 +185,6 @@ qudt:Length  a  owl:NamedIndividual .
                            owl:hasValue    false ;
                            owl:onProperty  :hasDimensionalConsistency
                          ] .
-
-[ a                    owl:AllDifferent ;
-  owl:distinctMembers  [ a          rdf:List ;
-                         rdf:first  :MildSteel ;
-                         rdf:rest   [ a          rdf:List ;
-                                      rdf:first  :StainlessSteel ;
-                                      rdf:rest   ()
-                                    ]
-                       ]
-] .
 
 :WorkpieceCharacteristic
         a                owl:Class ;
@@ -214,7 +207,7 @@ qudt:Length  a  owl:NamedIndividual .
         a             owl:NamedIndividual , :RegressionEquation ;
         rdfs:comment  "F_i=k_c*V^(?_c)*f^(?_c)*d_i^(?_c)*(tw,i+t)^?_c" .
 
-:t_wi   :hasConcept  :CumulativeUse , :TotalProcessValue , :ProcessTime .
+:t_wi   :hasConcept  :CumulativeUse , :TotalProcessValue , :ProcessTime , :CalculatedValue .
 
 qudt:Power  a   owl:NamedIndividual .
 
@@ -232,21 +225,33 @@ qudt:Power  a   owl:NamedIndividual .
         :hasProcessContext   :Turning ;
         :referencesProperty  :CuttingForce , :InitialRadius , :CuttingSpeed , :Radius , :SurfaceRoughness , :ToolWear , :CuttingFeedRate , :DepthOfCut .
 
+[ a                    owl:AllDifferent ;
+  owl:distinctMembers  [ a          rdf:List ;
+                         rdf:first  :CastIron ;
+                         rdf:rest   [ a          rdf:List ;
+                                      rdf:first  :StainlessSteel ;
+                                      rdf:rest   ()
+                                    ]
+                       ]
+] .
+
 :Alloy  a                owl:Class ;
         rdfs:comment     "Material composed of multiple metals or metals and other elements" ;
         rdfs:subClassOf  :Material .
 
 :Milling  a     owl:NamedIndividual , :MultiPointCutting .
 
-:C_h    :hasConcept         :Cost ;
+:C_h    :hasConcept         :Cost , :Constant ;
         :hasNumericalValue  0.5 ;
         :hasUnits           :USDollarPerMinute .
 
-:sigma_c  :hasNumericalValue  0.03877 .
+:sigma_c  :hasConcept       :Constant ;
+        :hasNumericalValue  0.03877 .
 
-:k_w    :hasNumericalValue  0.000082961 .
+:k_w    :hasConcept         :Constant ;
+        :hasNumericalValue  0.000082961 .
 
-:d_max  :hasConcept         :DepthOfCut , :MaximumAcceptableValue ;
+:d_max  :hasConcept         :DepthOfCut , :MaximumAcceptableValue , :Constant ;
         :hasNumericalValue  1.5 ;
         :hasUnits           :Millimeter .
 
@@ -286,7 +291,8 @@ qudt:Power  a   owl:NamedIndividual .
 
 :StainlessSteel  a  owl:NamedIndividual , :Alloy .
 
-:gamma_c  :hasNumericalValue  1.033 .
+:gamma_c  :hasConcept       :Constant ;
+        :hasNumericalValue  1.033 .
 
 :MachineCharacteristic
         a                owl:Class ;
@@ -296,7 +302,7 @@ qudt:Power  a   owl:NamedIndividual .
 :MinimumAcceptableValue
         a       owl:NamedIndividual , :Modifier .
 
-:R_USL  :hasConcept         :SurfaceRoughness , :MaximumAcceptableValue ;
+:R_USL  :hasConcept         :SurfaceRoughness , :MaximumAcceptableValue , :Constant ;
         :hasNumericalValue  10.0 ;
         :hasUnits           :Micrometer .
 
@@ -304,7 +310,7 @@ qudt:Power  a   owl:NamedIndividual .
 
 unit:Minute  a  owl:NamedIndividual .
 
-:D_LSL  :hasConcept         :FinalDimension , :Diameter , :WorkpieceDimension , :MinimumAcceptableValue ;
+:D_LSL  :hasConcept         :FinalDimension , :Diameter , :WorkpieceDimension , :MinimumAcceptableValue , :Constant ;
         :hasNumericalValue  97.9 ;
         :hasUnits           :Millimeter .
 
@@ -323,11 +329,13 @@ unit:Micrometer  a  owl:NamedIndividual .
         :hasQuantityKind     qudt:Force ;
         :representsProperty  :CuttingForce .
 
-:k_r    :hasNumericalValue  11.619 .
+:k_r    :hasConcept         :Constant ;
+        :hasNumericalValue  11.619 .
 
 :CastIron  a    owl:NamedIndividual , :Alloy .
 
-:alpha_w  :hasNumericalValue  2.747 .
+:alpha_w  :hasConcept       :Constant ;
+        :hasNumericalValue  2.747 .
 
 :ModelAbstraction  a     owl:Class ;
         rdfs:comment     "A conceptualization of a manufacturing process" ;
@@ -351,9 +359,9 @@ unit:Micrometer  a  owl:NamedIndividual .
 
 :N      a                   owl:NamedIndividual , :Symbol ;
         rdfs:comment        "Number of parts made before regrind" ;
+        :description        "Tool Regrind Scenario" ;
         :hasConcept         :MachineToolChanger , :TotalProcessValue ;
         :hasNumericalValue  1 ;
-        :hasURI             :toolRegrindScenario ;
         :hasUnits           :Unitless .
 
 :Abstract  a          owl:Class ;
@@ -368,16 +376,6 @@ unit:Micrometer  a  owl:NamedIndividual .
 :Material  a             owl:Class ;
         rdfs:comment     "Substance that the Workpiece/FinishedPart is made up of" ;
         rdfs:subClassOf  :WorkpieceCharacteristic .
-
-[ a                    owl:AllDifferent ;
-  owl:distinctMembers  [ a          rdf:List ;
-                         rdf:first  :CastIron ;
-                         rdf:rest   [ a          rdf:List ;
-                                      rdf:first  :MildSteel ;
-                                      rdf:rest   ()
-                                    ]
-                       ]
-] .
 
 :hasUnits  a    owl:AnnotationProperty .
 
@@ -397,11 +395,21 @@ unit:Micrometer  a  owl:NamedIndividual .
         :hasNumericalValue  0.0075 ;
         :hasUnits           :USDollarPerMillimeterSquared .
 
-:Boring  a      owl:NamedIndividual , :SinglePointCutting .
-
 :Machinery  a            owl:Class ;
         rdfs:comment     "Machines needed to produce part" ;
         rdfs:subClassOf  :Resource .
+
+:Boring  a      owl:NamedIndividual , :SinglePointCutting .
+
+[ a                    owl:AllDifferent ;
+  owl:distinctMembers  [ a          rdf:List ;
+                         rdf:first  :Aluminum ;
+                         rdf:rest   [ a          rdf:List ;
+                                      rdf:first  :StainlessSteel ;
+                                      rdf:rest   ()
+                                    ]
+                       ]
+] .
 
 :PhysicalEquation  a     owl:Class ;
         rdfs:comment     "Equations based on physics concepts with consistent dimensionality" ;
@@ -411,11 +419,21 @@ unit:Micrometer  a  owl:NamedIndividual .
                            owl:onProperty  :hasDimensionalConsistency
                          ] .
 
+[ a                    owl:AllDifferent ;
+  owl:distinctMembers  [ a          rdf:List ;
+                         rdf:first  :Aluminum ;
+                         rdf:rest   [ a          rdf:List ;
+                                      rdf:first  :CastIron ;
+                                      rdf:rest   ()
+                                    ]
+                       ]
+] .
+
 :V      a                    owl:NamedIndividual , :Symbol ;
+        :description         "Cutting Speed" ;
         :hasConcept          :CuttingSpeed ;
         :hasNumericalValue   70.0 ;
         :hasProcessContext   :Turning ;
-        :hasURI              :CuttingSpeed ;
         :hasUnits            :MeterPerMinute ;
         :representsProperty  :CuttingSpeed .
 
@@ -429,12 +447,13 @@ qudt:Force  a   owl:NamedIndividual .
 
 :Shaping  a     owl:NamedIndividual , :SinglePointCutting .
 
-:Theta  :hasConcept         :ToolClearanceAngle ;
+:Theta  :hasConcept         :ToolClearanceAngle , :Constant ;
         :hasNumericalValue  15 ;
         :hasURI             :ToolClearanceAngle ;
         :hasUnits           :DegreeAngle .
 
-:alpha_r  :hasNumericalValue  0.261 .
+:alpha_r  :hasConcept       :Constant ;
+        :hasNumericalValue  0.261 .
 
 :Length  a      owl:NamedIndividual , :PartDimension .
 
@@ -451,20 +470,10 @@ qudt:Force  a   owl:NamedIndividual .
 
 :w_ci   a       owl:NamedIndividual , :Symbol .
 
-[ a                    owl:AllDifferent ;
-  owl:distinctMembers  [ a          rdf:List ;
-                         rdf:first  :Aluminum ;
-                         rdf:rest   [ a          rdf:List ;
-                                      rdf:first  :MildSteel ;
-                                      rdf:rest   ()
-                                    ]
-                       ]
-] .
-
 :CuttingToolMaterial  a  owl:Class ;
         rdfs:subClassOf  :CuttingTool .
 
-:Phi_i  :hasConcept         :SurfaceRoughness ;
+:Phi_i  :hasConcept         :SurfaceRoughness , :CalculatedValue ;
         :hasNumericalValue  9.73838 ;
         :hasUnits           :Micrometer .
 
@@ -475,7 +484,7 @@ qudt:Force  a   owl:NamedIndividual .
 
 :Planing  a     owl:NamedIndividual , :SinglePointCutting .
 
-:D_USL  :hasConcept         :FinalDimension , :Diameter , :WorkpieceDimension , :MaximumAcceptableValue ;
+:D_USL  :hasConcept         :FinalDimension , :Diameter , :WorkpieceDimension , :MaximumAcceptableValue , :Constant ;
         :hasNumericalValue  98.1 ;
         :hasUnits           :Millimeter .
 
@@ -491,16 +500,16 @@ qudt:Force  a   owl:NamedIndividual .
         owl:inverseOf  :hasProcessContext .
 
 :W_hat  a                   owl:NamedIndividual , :Symbol ;
-        :hasConcept         :ToolWear , :MaximumAcceptedValue ;
+        :hasConcept         :ToolWear , :MaximumAcceptedValue , :Constant ;
         :hasNumericalValue  0.40 ;
         :hasURI             :maxToolWear ;
         :hasUnits           :Micrometer .
 
 :f      a                    owl:NamedIndividual , :Symbol ;
+        :description         "Cutting Feed Rate" ;
         :hasConcept          :CuttingFeedRate ;
         :hasNumericalValue   0.0898 ;
         :hasProcessContext   :Turning ;
-        :hasURI              :CuttingFeedRate ;
         :hasUnits            :MillimeterPerRevolution ;
         :representsProperty  :CuttingFeedRate .
 
@@ -512,6 +521,16 @@ qudt:Force  a   owl:NamedIndividual .
         rdfs:comment     "a ModelProperty whose value can be specified so as to specify a context of the analysis." ;
         rdfs:subClassOf  :ModelProperty .
 
+[ a                    owl:AllDifferent ;
+  owl:distinctMembers  [ a          rdf:List ;
+                         rdf:first  :CastIron ;
+                         rdf:rest   [ a          rdf:List ;
+                                      rdf:first  :MildSteel ;
+                                      rdf:rest   ()
+                                    ]
+                       ]
+] .
+
 :TurningOptimization  a      owl:NamedIndividual , :Model ;
         :referencesEquation  :CuttingForceEquation , :ProcessingTimeEquation , :SurfaceRoughnessEquation , :ToolWearEquation .
 
@@ -522,10 +541,10 @@ qudt:Time  a    owl:NamedIndividual .
 :Y      a          owl:NamedIndividual , :TestVars ;
         :hasUnits  :Newton .
 
-:D      a                    owl:NamedIndividual , :Symbol ;
-        :hasConcept          :FinalDimension , :Diameter , :WorkpieceDimension ;
+:D      a                    :Symbol , owl:NamedIndividual ;
+        :description         "Final Dimension" ;
+        :hasConcept          :WorkpieceDimension , :Constant , :FinalDimension , :Diameter ;
         :hasNumericalValue   98.0 ;
-        :hasURI              :FinalDiameter ;
         :hasUnits            :Millimeter ;
         :representsProperty  :Radius .
 
@@ -535,7 +554,7 @@ qudt:Time  a    owl:NamedIndividual .
 
 unit:USDollar  a  owl:NamedIndividual .
 
-:power_max  :hasConcept     :Horsepower , :MaximumAcceptableValue ;
+:power_max  :hasConcept     :Horsepower , :MaximumAcceptableValue , :Constant ;
         :hasNumericalValue  15000.0 ;
         :hasUnits           :Watt .
 
@@ -558,7 +577,7 @@ unit:USDollar  a  owl:NamedIndividual .
 
 :MachinePower  a  owl:NamedIndividual , :MachineCharacteristic .
 
-:L      :hasConcept         :FinalDimension , :Length , :WorkpieceDimension ;
+:L      :hasConcept         :FinalDimension , :Length , :WorkpieceDimension , :Constant ;
         :hasNumericalValue  35.0 .
 
 :theta  a                    owl:NamedIndividual , :Symbol ;
@@ -567,7 +586,8 @@ unit:USDollar  a  owl:NamedIndividual .
 :m_1    a          owl:NamedIndividual , :TestVars ;
         :hasUnits  :Mass .
 
-:k_c    :hasNumericalValue  1514.6 .
+:k_c    :hasConcept         :Constant ;
+        :hasNumericalValue  1514.6 .
 
 :MultiPointCutting  a    owl:Class ;
         rdfs:subClassOf  :MachiningProcess .
@@ -584,7 +604,7 @@ unit:Millimeter  a  owl:NamedIndividual .
 :Horsepower  a            owl:NamedIndividual , :ProcessConstraint ;
         :hasQuantityKind  qudt:Power .
 
-:V_min  :hasConcept         :CuttingSpeed , :MinimumAcceptableValue ;
+:V_min  :hasConcept         :CuttingSpeed , :MinimumAcceptableValue , :Constant ;
         :hasNumericalValue  32.0 ;
         :hasUnits           :MeterPerMinute .
 
@@ -594,19 +614,23 @@ unit:Millimeter  a  owl:NamedIndividual .
         :hasProcessContext         :Turning ;
         :isDirectlyProportionalTo  :CumulativeUse , :CuttingFeedRate , :CuttingSpeed .
 
-:beta_w  :hasNumericalValue  1.473 .
+:beta_w  :hasConcept        :Constant ;
+        :hasNumericalValue  1.473 .
 
 :MachiningProcess  a     owl:Class ;
         rdfs:comment     "A subtractive manufacturing process" ;
         rdfs:subClassOf  :ManufacturingProcess .
 
-:F_i    :hasConcept  :CuttingForce .
+:F_i    :hasConcept  :CuttingForce , :CalculatedValue .
 
 :Ceramic  a     owl:NamedIndividual , :CuttingToolMaterial .
 
 :T_N    a                    owl:NamedIndividual , :Symbol ;
         :hasObjectiveType    "avoided_processCharacteristic" ;
         :representsProperty  :CumulativeUse .
+
+:description  a     owl:DatatypeProperty ;
+        rdfs:range  xsd:string .
 
 :Equipment  a            owl:Class ;
         rdfs:comment     "Machine(s) used to turn workpiece into finished part" ;
@@ -637,18 +661,20 @@ unit:Millimeter  a  owl:NamedIndividual .
 :X_1    a          owl:NamedIndividual , :TestVars ;
         :hasUnits  :Kilogram .
 
-:alpha_c  :hasNumericalValue  0.0992 .
+:alpha_c  :hasConcept       :Constant ;
+        :hasNumericalValue  0.0992 .
 
 :EquipmentCharacteristic
         a                owl:Class ;
         rdfs:comment     "Equipment aspect that contributes to the manufacturing process" ;
         rdfs:subClassOf  :Physical .
 
-:f_min  :hasConcept         :CuttingFeedRate , :MinimumAcceptableValue ;
+:f_min  :hasConcept         :CuttingFeedRate , :MinimumAcceptableValue , :Constant ;
         :hasNumericalValue  0.08 ;
         :hasUnits           :MillimeterPerRevolution .
 
-:beta_r  :hasNumericalValue  0.565 .
+:beta_r  :hasConcept        :Constant ;
+        :hasNumericalValue  0.565 .
 
 :Physical  a          owl:Class ;
         rdfs:comment  "Aspect that has a spatial or temporal location" .
@@ -658,10 +684,10 @@ unit:Millimeter  a  owl:NamedIndividual .
         :hasQuantityKind  qudt:Length .
 
 :d_i    a                    owl:NamedIndividual , :Symbol ;
+        :description         "Depth of Cut" ;
         :hasConcept          :DepthOfCut ;
         :hasNumericalValue   1.05 ;
         :hasProcessContext   :Turning ;
-        :hasURI              :DepthOfCut ;
         :hasUnits            :Millimeter ;
         :representsProperty  :DepthOfCut .
 
@@ -705,9 +731,9 @@ qudt:Dimensionless  a  owl:NamedIndividual .
 :t_c    a                  owl:NamedIndividual , :Symbol ;
         :hasObjectiveType  "avoided_processCharacteristic" .
 
-:delta_i  :hasConcept       :DepthOfCut , :ToolWear ;
+:delta_i  :description      "Toolwear Compensation" ;
+        :hasConcept         :DepthOfCut , :ToolWear ;
         :hasNumericalValue  0.050 ;
-        :hasURI             :delta ;
         :hasUnits           :Millimeter .
 
 :ObjectiveFunction  a    owl:Class ;
@@ -721,23 +747,14 @@ qudt:Dimensionless  a  owl:NamedIndividual .
         :hasQuantityKind  :LinearVelocity ;
         :hasSymbol        :f .
 
-[ a                    owl:AllDifferent ;
-  owl:distinctMembers  [ a          rdf:List ;
-                         rdf:first  :CastIron ;
-                         rdf:rest   [ a          rdf:List ;
-                                      rdf:first  :StainlessSteel ;
-                                      rdf:rest   ()
-                                    ]
-                       ]
-] .
-
 :hasWorkpiece  a  owl:ObjectProperty , owl:InverseFunctionalProperty .
 
-:C_g    :hasConcept         :Cost ;
+:C_g    :hasConcept         :Cost , :Constant ;
         :hasNumericalValue  20.0 ;
         :hasUnits           :USDollar .
 
-:sigma_w  :hasNumericalValue  0.43 .
+:sigma_w  :hasConcept       :Constant ;
+        :hasNumericalValue  0.43 .
 
 :TestVars  a    owl:Class .
 
@@ -752,7 +769,7 @@ qudt:Dimensionless  a  owl:NamedIndividual .
         :hasProcessContext         :Turning ;
         :isDirectlyProportionalTo  :CumulativeUse .
 
-:d_min  :hasConcept         :DepthOfCut , :MinimumAcceptableValue ;
+:d_min  :hasConcept         :DepthOfCut , :MinimumAcceptableValue , :Constant ;
         :hasNumericalValue  0.5 ;
         :hasUnits           :Millimeter .
 
@@ -775,14 +792,15 @@ qudt:Dimensionless  a  owl:NamedIndividual .
         rdfs:subClassOf  :Equipment .
 
 :R      a                   owl:NamedIndividual , :Symbol ;
-        :hasConcept         :SurfaceRoughness , :TargetValue ;
+        :hasConcept         :SurfaceRoughness , :TargetValue , :Constant ;
         :hasNumericalValue  2.5 ;
         :hasURI             :targetSurfaceRoughness ;
         :hasUnits           :Micrometer .
 
 :CementedCarbide  a  owl:NamedIndividual , :CuttingToolMaterial .
 
-:gamma_w  :hasNumericalValue  1.261 .
+:gamma_w  :hasConcept       :Constant ;
+        :hasNumericalValue  1.261 .
 
 :ProcessTime  a  owl:NamedIndividual , :ProcessCharacteristic .
 
@@ -800,7 +818,7 @@ qudt:Dimensionless  a  owl:NamedIndividual .
 :Grinding  a    owl:NamedIndividual , :MultiPointCutting .
 
 :D_0    a                    owl:NamedIndividual , :Symbol ;
-        :hasConcept          :Diameter , :InitialDimension , :WorkpieceDimension ;
+        :hasConcept          :Diameter , :InitialDimension , :WorkpieceDimension , :Constant ;
         :hasNumericalValue   100.0 ;
         :representsProperty  :InitialRadius .
 

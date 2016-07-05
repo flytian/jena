@@ -45,6 +45,7 @@ public class SIDimension implements Dimension{
 				+ "FILTER (?quantity != qudt:SIBaseUnit ) \n "
 				+ "FILTER (?quantity != qudt:NonSIUnit ) \n "
 				+ "FILTER (?quantity != qudt:SIDerivedUnit ) \n "
+				+ "FILTER (?quantity != qudt:SIUnit ) \n "
 				+ "\n }";
 		Query quantityQuery = QueryFactory.create(findQuantityKind, Syntax.syntaxSPARQL);
 		QueryExecution queryExec = QueryExecutionFactory.create(quantityQuery, unitsOntology);
@@ -279,6 +280,22 @@ public class SIDimension implements Dimension{
 		newDimension.setN(N + otherCopy.getN());
 		newDimension.setJ(J + otherCopy.getJ());
 		newDimension.setU(U + otherCopy.getU());
+		
+		return newDimension;
+	}
+
+	public Dimension divide(Dimension otherDimension) {
+		SIDimension otherCopy = (SIDimension) otherDimension;
+		SIDimension newDimension = new SIDimension();
+		newDimension.setDimensionUnits(dimensionUnits + "/" + otherDimension.getDimensionUnits());
+		newDimension.setI(I - otherCopy.getI());
+		newDimension.setM(M - otherCopy.getM());
+		newDimension.setL(L - otherCopy.getL());
+		newDimension.setT(T - otherCopy.getT());
+		newDimension.setTheta(theta - otherCopy.getTheta());
+		newDimension.setN(N - otherCopy.getN());
+		newDimension.setJ(J - otherCopy.getJ());
+		newDimension.setU(U - otherCopy.getU());
 		
 		return newDimension;
 	}

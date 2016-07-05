@@ -1,0 +1,87 @@
+@prefix mfi:   <http://modelmeth.nist.gov/mfi#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+
+mfi:realURI  a            mfi:MathContent ;
+        mfi:hasLaTeXText  " d_i = \\frac{D_0 - D}{2} + \\delta_i "^^xsd:string ;
+        mfi:hasRelation   [ a                    mfi:Relation ;
+                            mfi:hasLHS           [ a            mfi:Expression ;
+                                                   mfi:hasTerm  [ a                 mfi:Term ;
+                                                                  mfi:hasFactor     [ a                   mfi:Factor ;
+                                                                                      mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                                                                                      mfi:hasVariable     [ a                 mfi:Variable ;
+                                                                                                            mfi:hasName       "d"^^xsd:string ;
+                                                                                                            mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                                                                                mfi:hasExpression  _:b3 ;
+                                                                                                                                mfi:hasFactor      _:b3
+                                                                                                                              ]
+                                                                                                          ]
+                                                                                    ] ;
+                                                                  mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger
+                                                                ]
+                                                 ] ;
+                            mfi:hasRHS           [ a                  mfi:Expression ;
+                                                   mfi:hasExpression  [ a            mfi:Expression ;
+                                                                        mfi:hasTerm  [ a                 mfi:Term ;
+                                                                                       mfi:hasFactor     [ a                   mfi:Factor ;
+                                                                                                           mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                                                                                                           mfi:hasVariable     [ a                 mfi:Variable ;
+                                                                                                                                 mfi:hasName       "delta"^^xsd:string ;
+                                                                                                                                 mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                                                                                                     mfi:hasExpression  _:b4 ;
+                                                                                                                                                     mfi:hasFactor      _:b4
+                                                                                                                                                   ]
+                                                                                                                               ]
+                                                                                                         ] ;
+                                                                                       mfi:hasTermOrder  "2"^^xsd:nonNegativeInteger
+                                                                                     ]
+                                                                      ] ;
+                                                   mfi:hasTerm        _:b1 ;
+                                                   mfi:plusOp         _:b1
+                                                 ] ;
+                            mfi:hasRelationalOp  mfi:eq
+                          ] .
+
+_:b4    mfi:hasVariable  [ a            mfi:Variable ;
+                           mfi:hasName  "i"^^xsd:string
+                         ] .
+
+_:b3    mfi:hasVariable  [ a            mfi:Variable ;
+                           mfi:hasName  "i"^^xsd:string
+                         ] .
+
+_:b2    a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                 mfi:Variable ;
+                                                  mfi:hasName       "D"^^xsd:string ;
+                                                  mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                      mfi:hasExpression  _:b0 ;
+                                                                      mfi:hasFactor      _:b0
+                                                                    ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+_:b0    mfi:hasValue  [ a             mfi:LiteralNumber ;
+                        mfi:hasValue  "0"^^xsd:decimal
+                      ] .
+
+_:b1    a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasFraction     [ a                   mfi:Fraction ;
+                                                  mfi:hasDenominator  [ mfi:hasValue  [ a             mfi:LiteralNumber ;
+                                                                                        mfi:hasValue  "2"^^xsd:decimal
+                                                                                      ] ] ;
+                                                  mfi:hasNumerator    [ a              mfi:Expression ;
+                                                                        mfi:hasFactor  [ mfi:hasVariable  [ a            mfi:Variable ;
+                                                                                                            mfi:hasName  "D"^^xsd:string
+                                                                                                          ] ] ;
+                                                                        mfi:hasTerm    _:b2 ;
+                                                                        mfi:minusOp    _:b2
+                                                                      ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
