@@ -47,391 +47,6 @@ public class Identifier {
 		prefixes = prefixesIn;
 	}
 
-	//find the dimensions of one side of an equation given the side and the equation URI
-	public Dimension findDimensionality(String equationURI, String equationSide) {
-		return findDimensionality(equationURI, equationSide, "SI");
-	}
-
-	//find the dimension vector of one side of an equation
-	public Dimension findDimensionality(String equationURI, String equationSide, String systemOfUnits) {
-		Dimension finalDimension;	
-		Dimension termDimension;
-		switch (systemOfUnits) {
-		case "US" :
-			finalDimension = new USDimension();
-			break;
-		case "Planck":
-			finalDimension = new PlanckDimension();
-			break;
-		case "CGS" :
-			finalDimension=new CGSDimension();
-			break;
-		default :
-			finalDimension = new SIDimension();	
-		}
-
-		Dimension dimension; //temporary variable
-
-		ArrayList<Dimension> factorsToMultiply = new ArrayList<Dimension>(); //list of dimensions that go into finalDimension
-		ArrayList<String> factors = new ArrayList<String>(); //list of factors of each side of the equation		
-		ArrayList<Dimension> terms = new ArrayList<Dimension>(); //list of terms in an expression
-
-		String nameQuery;
-		Boolean hasTerm = false;
-		do {
-			//expression or term?
-			String expressionQuery = prefixes + NL
-					+"ASK { mfi:" +equationURI+" mfi:hasRelation _:a . \n "
-					+ "_:a mfi:" + equationSide + " _:b .\n "
-					+ " _:b mfi:hasExpression _:c . } \n";
-			Boolean isExpression = ask(expressionQuery);
-			
-			if(isExpression) {
-				nameQuery = "mfi:" +equationURI+" mfi:hasRelation _:a . \n "
-						+ "_:a mfi:" + equationSide + " _:b . \n" 
-						+"_:b mfi:hasExpression _:x .\n "
-						+ " _:x mfi:hasTerm _:c . \n" + 
-						" _:c mfi:hasFactor _:d . \n "
-						+ "_:d ";
-
-				String additionalTermQuery = prefixes + NL
-						+"ASK { mfi:" +equationURI+" mfi:hasRelation _:a . \n "
-						+ "_:a mfi:" + equationSide + " _:b .\n "
-						+ " _:b mfi:hasTerm _:c . } \n";
-				hasTerm = ask(additionalTermQuery);
-			} else {
-				nameQuery = "mfi:" +equationURI+" mfi:hasRelation _:a . \n "
-						+ "_:a mfi:" + equationSide + " _:b .\n "
-						+ " _:b mfi:hasTerm _:c . \n" + 
-						" _:c mfi:hasFactor _:d . \n"
-						+ "_:d ";
-			}	
-
-			String denomQuery = " mfi:hasFraction _:k . \n"
-					+ "_:k mfi:hasDenominator _:l . \n"
-					+ "_:l ";
-			String numQuery = " mfi:hasFraction _:k . \n"
-					+ "_:k mfi:hasNumerator _:m . \n"
-					+ "_:m ";
-			String factorQuery = " mfi:hasVariable _:n ."
-					+ "_:n mfi:hasName ?name .";
-			String subQuery = "_:n mfi:hasSubscript _:e . \n"
-					+ "_:e mfi:hasFactor _:f . \n"
-					+ "_:f mfi:hasVariable _:g . \n"
-					+ "_:g mfi:hasName ?subscript . \n";
-			String supQuery = "_:n mfi:hasSuperscript _:h . \n"
-					+ "_:h mfi:hasFactor _:i . \n"
-					+ "_:i mfi:hasVariable _:j . \n"
-					+ "_:j mfi:hasName ?subscript . \n";	
-			String valueQuery = " mfi:hasValue _:o .\n"
-					+ "_:o mfi:hasValue ?value .";
-
-			String nameStatement; //customized query w name of each factor
-			String checkSubscript; //query to check for presence of subscript to factor
-			String checkSuperscript; //query to check for presence of superscript to factor		
-			
-			if (ask(nameQuery + factorQuery)){
-
-				//query to create list of names of multiplied factors in equation
-				String queryString03 =   prefixes + NL +
-						"SELECT ?name " + NL +
-						"WHERE { \n " + nameQuery + factorQuery + "\n }";
-				Query query03 = QueryFactory.create(queryString03, Syntax.syntaxSPARQL);
-				QueryExecution qexec03 = QueryExecutionFactory.create(query03, myModel);
-				ResultSet names = qexec03.execSelect();
-				for (; names.hasNext() ; ) {
-					QuerySolution rb = names.nextSolution();
-					LiteralImpl x = (LiteralImpl) rb.getLiteral("name");
-					factors.add(x.getString());
-				}
-				qexec03.close();
-				for (int index=0;index<factors.size(); index++) {
-
-					if(isExpression) {
-						nameStatement = "mfi:" +equationURI+" mfi:hasRelation _:g . \n "
-								+ "_:g mfi:" + equationSide + " _:x. \n" 
-								+"_:x mfi:hasExpression _:d .\n "
-								+ " _:d mfi:hasTerm _:a . \n" + 
-								" _:a mfi:hasFactor _:b . \n " + 
-								" _:b mfi:hasVariable _:c . \n "
-								+ "_:c mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
-					} else {
-						nameStatement = "mfi:" +equationURI+" mfi:hasRelation _:g . \n "
-								+ "_:g mfi:" + equationSide + " _:d .\n "
-								+ " _:d mfi:hasTerm _:a . \n" + 
-								" _:a mfi:hasFactor _:b . \n " + 
-								" _:b mfi:hasVariable _:c . \n "
-								+ "_:c mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
-					}
-
-					checkSubscript =  prefixes + NL + "ASK {"+nameStatement + subQuery +"}"; 
-					Boolean subscriptPresent = ask(checkSubscript);
-
-					checkSuperscript =  prefixes + NL + "ASK {" + nameStatement + supQuery + "}";
-					Boolean superscriptPresent = ask(checkSuperscript);
-
-					if(subscriptPresent && superscriptPresent) { 
-
-						String queryString =   prefixes + NL +
-								"SELECT ?superscript ?subscript" + NL +
-								"WHERE { \n "+ nameStatement + subQuery + supQuery + " }"
-								+ "GROUP BY ?superscript ?subscript";
-
-						Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
-
-						QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-						ResultSet rs = qexec.execSelect();
-
-						for ( ; rs.hasNext() ; ){
-							QuerySolution rb = rs.nextSolution() ;
-							LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
-							LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
-							System.out.println("(" + factors.get(index) + "_" + z.getString() + ")^" + y.getString());
-							if(!(y.getDatatype()).equals(XSDDatatype.XSDinteger)) {
-								throw new UndeterminedDimensionException();
-							}
-							String queryString04 = prefixes + NL  + "SELECT ?dimension" + NL  + 
-									"WHERE {:" + factors.get(index) + "_" + z.getString() + " :hasUnits" + " ?dimension}";
-							Query query04 = QueryFactory.create(queryString04);
-							QueryExecution qexec04 = QueryExecutionFactory.create(query04, ontologyModel);
-							ResultSet factorDimension = qexec04.execSelect();
-							for (; factorDimension.hasNext() ;) {
-								QuerySolution rb3 = factorDimension.nextSolution();
-								Resource x3 = (Resource) rb3.getResource("dimension");
-								dimension = new SIDimension(x3.getLocalName());
-								for(int k=1; k < y.getInt(); k++) {
-									dimension = dimension.multiply(dimension);
-								}
-								factorsToMultiply.add(dimension);
-							}					
-							qexec04.close();
-						}
-						qexec.close() ;
-
-
-					} else if(!subscriptPresent && superscriptPresent) {
-
-						String queryString =   prefixes + NL +
-								"SELECT ?superscript" + NL +
-								"WHERE { \n"+ nameStatement + supQuery + "}"
-								+ "GROUP BY ?superscript";
-
-						Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
-
-						QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-						ResultSet rs = qexec.execSelect();
-
-						for ( ; rs.hasNext() ; ){
-							QuerySolution rb = rs.nextSolution() ;
-							LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
-							System.out.println(factors.get(index) +"^" + y.getString());
-							if(!(y.getDatatype()).equals(XSDDatatype.XSDinteger)) {
-								throw new UndeterminedDimensionException();
-							}
-							String queryString04 = prefixes + NL  + "SELECT ?dimension" + NL  + 
-									"WHERE {:" + factors.get(index) + " :hasUnits" + " ?dimension}";
-							Query query04 = QueryFactory.create(queryString04);
-							QueryExecution qexec04 = QueryExecutionFactory.create(query04, ontologyModel);
-							ResultSet factorDimension = qexec04.execSelect();
-							for (; factorDimension.hasNext() ;) {
-								QuerySolution rb3 = factorDimension.nextSolution();
-								Resource x3 = (Resource) rb3.getResource("dimension");
-								dimension = new SIDimension(x3.getLocalName());
-								for(int k=1; k < y.getInt(); k++) {
-									dimension = dimension.multiply(dimension);
-								}
-								factorsToMultiply.add(dimension);
-							}
-							qexec04.close();
-						}
-
-						qexec.close() ;
-
-					}else if(subscriptPresent && !superscriptPresent) {
-
-						String queryString =   prefixes + NL +
-								"SELECT ?subscript" + NL +
-								"WHERE { \n "+ nameStatement + subQuery + "}"
-								+ "GROUP BY ?subscript";
-
-						Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
-
-						QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-						ResultSet rs = qexec.execSelect();
-
-						for ( ; rs.hasNext() ; ){
-							QuerySolution rb = rs.nextSolution() ;
-							LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
-							String queryString04 = prefixes + NL  + "SELECT ?dimension" + NL  + 
-									"WHERE { \n :" + factors.get(index) + "_" + z.getString() + " :hasUnits" + " ?dimension \n}";
-							Query query04 = QueryFactory.create(queryString04, Syntax.syntaxSPARQL);
-							QueryExecution qexec04 = QueryExecutionFactory.create(query04, ontologyModel);
-							ResultSet factorDimension = qexec04.execSelect();
-							for (; factorDimension.hasNext() ;) {
-								QuerySolution rb3 = factorDimension.nextSolution();
-								Resource x3 = (Resource) rb3.getResource("dimension");
-								dimension = new SIDimension(x3.getLocalName());
-								factorsToMultiply.add(dimension);
-							}
-
-							System.out.println(factors.get(index) + "_" + z.getString());
-							qexec04.close();
-						}
-
-						qexec.close() ;
-					} else {
-						String queryString04 = prefixes + NL  + "SELECT ?dimension" + NL  + 
-								"WHERE {:" + factors.get(index) + " :hasUnits" + " ?dimension}";
-						Query query04 = QueryFactory.create(queryString04);
-						QueryExecution qexec04 = QueryExecutionFactory.create(query04, ontologyModel);
-						ResultSet factorDimension = qexec04.execSelect();
-						for (; factorDimension.hasNext() ;) {
-							QuerySolution rb3 = factorDimension.nextSolution();
-							Resource x3 = (Resource) rb3.getResource("dimension");
-							dimension = new SIDimension(x3.getLocalName());
-							factorsToMultiply.add(dimension);
-						}
-						System.out.println(factors.get(index));
-						qexec04.close();
-					}
-				}
-				
-				if(factorsToMultiply.size()>0) {
-					termDimension = factorsToMultiply.get(0);
-					for(int i=1; i<factorsToMultiply.size(); i++) {
-						termDimension = factorsToMultiply.get(i).multiply(termDimension);
-					}
-				} 
-
-			}else if (ask(nameQuery + numQuery + NL + nameQuery + denomQuery)){
-
-				//query to add names of fraction factors
-				String queryString05 =   prefixes + NL +
-						"SELECT ?name " + NL +
-						"WHERE { \n " + nameQuery + numQuery + factorQuery + denomQuery + factorQuery + "\n }";
-				Query query05 = QueryFactory.create(queryString05, Syntax.syntaxSPARQL);
-				QueryExecution qexec05 = QueryExecutionFactory.create(query05, myModel);
-				ResultSet fractionNames = qexec05.execSelect();
-				for (; fractionNames.hasNext() ; ) {
-					QuerySolution rb = fractionNames.nextSolution();
-					LiteralImpl x = (LiteralImpl) rb.getLiteral("name");
-					factors.add(x.getString());
-				}
-				qexec05.close();
-
-			} else {
-				System.out.println("not good");
-			}		
-		} while (hasTerm=false);
-		
-		if(terms.size()>0) {
-			finalDimension = terms.get(0);
-			for(int i=1; i<terms.size(); i++) {
-				if(terms.get(i).equals(terms.get(i-1))) {
-					continue;
-				} else {
-					throw new UndeterminedDimensionException();
-				}
-			}
-		} 
-		
-		return finalDimension;	
-	}
-
-	//checks proportionality of variables
-	public Boolean checkProportionality(String equationURI){
-		Boolean consistency=true;
-
-		ArrayList<String> factors = new ArrayList<String>(); //list of factors of each side of the equation
-
-		String nameQuery = ":" +equationURI+" :hasRHS _:d . \n "
-				+ " _:d :hasTerm _:a . \n" + 
-				" _:a :hasFactor _:b . \n " + 
-				" _:b :hasVar _:c . \n "
-				+ "_:c :hasName ?name . \n";
-		String supQuery =  "_:c :hasSuperscript _:f . \n "
-				+ "_:f :hasExpression ?superscript . \n ";
-
-		//query to create list of names of factors in equation
-		String queryString03 =   prefixes + NL +
-				"SELECT ?name " + NL +
-				"WHERE { \n " + nameQuery + "\n }";
-		Query query03 = QueryFactory.create(queryString03, Syntax.syntaxSPARQL);
-		QueryExecution qexec03 = QueryExecutionFactory.create(query03, myModel);
-		ResultSet names = qexec03.execSelect();
-		for (; names.hasNext() ; ) {
-			QuerySolution rb = names.nextSolution();
-			LiteralImpl x = (LiteralImpl) rb.getLiteral("name");
-			factors.add(x.getString());
-		}
-		qexec03.close();
-
-		String nameStatement; //customized query w name of each factor
-		String checkSuperscript; //query to check for presence of superscript to factor
-
-		for (int index=0;index<factors.size(); index++) {
-
-			nameStatement = ":" +equationURI+" :hasRHS _:d . \n "
-					+ " _:d :hasTerm _:a . \n" + 
-					" _:a :hasFactor _:b . \n " + 
-					" _:b :hasVar _:c . \n "
-					+ "_:c :hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
-
-			checkSuperscript =  prefixes + NL +
-					"ASK {" + nameStatement + supQuery + "}";
-			Query query02 = QueryFactory.create(checkSuperscript) ;
-			QueryExecution qexec02 = QueryExecutionFactory.create(query02, myModel) ;
-			Boolean superscriptPresent = qexec02.execAsk();
-			qexec02.close();
-
-			String checkProportionality =  prefixes + NL +
-					"ASK { \n :" + factors.get(index) + " :isDirectlyProportionalTo ?object }"; 
-			/*
-			 * PROBLEM: What does the name from the equation correspond to? Probably the variable name
-			 * from the notebook. So, I need to query variable name -> concept -> description node -> 
-			 * whether or not the relationship is directly or indirectly proportional
-			 */
-			Query query = QueryFactory.create(checkProportionality) ;
-			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-			Boolean directlyProportional = qexec.execAsk();
-			System.out.println("Directly Proportional? " + directlyProportional);
-			qexec.close();
-
-			if(superscriptPresent) {
-
-				String queryString =   prefixes + NL +
-						"SELECT ?superscript" + NL +
-						"WHERE { \n "+ nameStatement + supQuery + " }";
-				Query query01 = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
-				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel) ;
-				ResultSet rs = qexec01.execSelect();
-
-				for ( ; rs.hasNext() ; ){
-					QuerySolution rb = rs.nextSolution() ;
-					LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
-					if(!(y.getDatatype()).equals(XSDDatatype.XSDinteger)) {
-						throw new UndeterminedDimensionException();
-					}
-					double superscript = y.getDouble();
-
-					if(directlyProportional == true && superscript<0) {
-						consistency=false;
-					} else if (directlyProportional == false && superscript>0) {
-						consistency=false;
-					}
-				}
-				qexec.close() ;
-
-			} else {
-				if (directlyProportional != true) {
-					consistency = false;
-				}
-			}
-		} 
-
-		return consistency;
-	}
-
 	//creates a Triple (object that stores subject and object) for a given predicate
 	public TripleList createTriple(String predicate) {
 		ArrayList<String> subject = new ArrayList<String>();
@@ -518,8 +133,102 @@ public class Identifier {
 		return objects;
 	}
 
-	public Boolean ask(String queryString) {
+	//checks proportionality of variables
+	public Boolean checkProportionality(String equationURI){
+		Boolean consistency=true;
+	
+		ArrayList<String> factors = new ArrayList<String>(); //list of factors of each side of the equation
+	
+		String nameQuery = ":" +equationURI+" :hasRHS _:d . \n "
+				+ " _:d :hasTerm _:a . \n" + 
+				" _:a :hasFactor _:b . \n " + 
+				" _:b :hasVar _:c . \n "
+				+ "_:c :hasName ?name . \n";
+		String supQuery =  "_:c :hasSuperscript _:f . \n "
+				+ "_:f :hasExpression ?superscript . \n ";
+	
+		//query to create list of names of factors in equation
+		String queryString03 =   prefixes + NL +
+				"SELECT ?name " + NL +
+				"WHERE { \n " + nameQuery + "\n }";
+		Query query03 = QueryFactory.create(queryString03, Syntax.syntaxSPARQL);
+		QueryExecution qexec03 = QueryExecutionFactory.create(query03, myModel);
+		ResultSet names = qexec03.execSelect();
+		for (; names.hasNext() ; ) {
+			QuerySolution rb = names.nextSolution();
+			LiteralImpl x = (LiteralImpl) rb.getLiteral("name");
+			factors.add(x.getString());
+		}
+		qexec03.close();
+	
+		String nameStatement; //customized query w name of each factor
+		String checkSuperscript; //query to check for presence of superscript to factor
+	
+		for (int index=0;index<factors.size(); index++) {
+	
+			nameStatement = ":" +equationURI+" :hasRHS _:d . \n "
+					+ " _:d :hasTerm _:a . \n" + 
+					" _:a :hasFactor _:b . \n " + 
+					" _:b :hasVar _:c . \n "
+					+ "_:c :hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
+	
+			checkSuperscript =  prefixes + NL +
+					"ASK {" + nameStatement + supQuery + "}";
+			Query query02 = QueryFactory.create(checkSuperscript) ;
+			QueryExecution qexec02 = QueryExecutionFactory.create(query02, myModel) ;
+			Boolean superscriptPresent = qexec02.execAsk();
+			qexec02.close();
+	
+			String checkProportionality =  prefixes + NL +
+					"ASK { \n :" + factors.get(index) + " :isDirectlyProportionalTo ?object }"; 
+			/*
+			 * PROBLEM: What does the name from the equation correspond to? Probably the variable name
+			 * from the notebook. So, I need to query variable name -> concept -> description node -> 
+			 * whether or not the relationship is directly or indirectly proportional
+			 */
+			Query query = QueryFactory.create(checkProportionality) ;
+			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+			Boolean directlyProportional = qexec.execAsk();
+			System.out.println("Directly Proportional? " + directlyProportional);
+			qexec.close();
+	
+			if(superscriptPresent) {
+	
+				String queryString =   prefixes + NL +
+						"SELECT ?superscript" + NL +
+						"WHERE { \n "+ nameStatement + supQuery + " }";
+				Query query01 = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
+				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel) ;
+				ResultSet rs = qexec01.execSelect();
+	
+				for ( ; rs.hasNext() ; ){
+					QuerySolution rb = rs.nextSolution() ;
+					LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
+					if(!(y.getDatatype()).equals(XSDDatatype.XSDinteger)) {
+						throw new UndeterminedDimensionException();
+					}
+					double superscript = y.getDouble();
+	
+					if(directlyProportional == true && superscript<0) {
+						consistency=false;
+					} else if (directlyProportional == false && superscript>0) {
+						consistency=false;
+					}
+				}
+				qexec.close() ;
+	
+			} else {
+				if (directlyProportional != true) {
+					consistency = false;
+				}
+			}
+		} 
+	
+		return consistency;
+	}
 
+	public Boolean ask(String askQuery) {
+		String queryString = prefixes + NL + "ASK { " + askQuery + "}";
 		Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
 		QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
 		Boolean answer = qexec.execAsk();
@@ -528,8 +237,431 @@ public class Identifier {
 		return answer;
 	}
 
-	public void hasFactor() {
+	public Dimension termDimension(ArrayList<String> factors, String systemOfUnits) {
+		
+		Dimension finalDimension;
+		Dimension dimension; //temporary variable
+		ArrayList<Dimension> dimensionsToMultiply = new ArrayList<Dimension>(); //list of dimensions that go into finalDimension
+	
+		String variableQuery = " mfi:hasVariable _:n ."
+				+ "_:n mfi:hasName ?name .";		
+		String valueQuery = " mfi:hasValue _:o .\n"
+				+ "_:o mfi:hasValue ?value .";
+		String subQuery = "_:n mfi:hasSubscript _:e . \n"
+				+ "_:e mfi:hasFactor _:f . \n"
+				+ "_:f ";
+		String supQuery = "_:n mfi:hasSuperscript _:h . \n"
+				+ "_:h mfi:hasFactor _:i . \n"
+				+ "_:i ";
 
+		String nameStatement; //customized query w name of each factor
+		String checkSubscript; //query to check for presence of subscript to factor
+		String checkSuperscript; //query to check for presence of superscript to factor	
+		
+		for (int index=0;index<factors.size(); index++) {
+			/*
+			if(isExpression) {
+				nameStatement = "mfi:" +equationURI+" mfi:hasRelation _:g . \n "
+						+ "_:g mfi:" + equationSide + " _:x. \n" 
+						+"_:x mfi:hasExpression _:d .\n "
+						+ " _:d mfi:hasTerm _:a . \n" + 
+						" _:a mfi:hasFactor _:b . \n " + 
+						" _:b mfi:hasVariable _:c . \n "
+						+ "_:c mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
+			} else {
+				nameStatement = "mfi:" +equationURI+" mfi:hasRelation _:g . \n "
+						+ "_:g mfi:" + equationSide + " _:d .\n "
+						+ " _:d mfi:hasTerm _:a . \n" + 
+						" _:a mfi:hasFactor _:b . \n " + 
+						" _:b mfi:hasVariable _:c . \n "
+						+ "_:c mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
+			}
+			*/
+			
+			nameStatement = "_:n mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
+			
+			checkSubscript =  prefixes + NL + "ASK {"+nameStatement + "_:n mfi:hasSubscript _:e . \n}"; 
+			Boolean subscriptPresent = ask(checkSubscript);
+
+			checkSuperscript =  prefixes + NL + "ASK {" + nameStatement + " _:n mfi:hasSuperscript _:h . \n}";
+			Boolean superscriptPresent = ask(checkSuperscript);
+
+			if(subscriptPresent && superscriptPresent) { 
+				String queryString;
+				if(ask(nameStatement + subQuery + valueQuery) && ask(nameStatement + supQuery + valueQuery)){
+					queryString =   prefixes + NL +
+							"SELECT ?superscript ?subscript" + NL +
+							"WHERE { \n "+ nameStatement + subQuery + valueQuery + supQuery + valueQuery+" }"
+							+ "GROUP BY ?superscript ?subscript";
+				} else if (!ask(nameStatement + subQuery + valueQuery) && ask(nameStatement + supQuery + valueQuery)){
+					queryString =   prefixes + NL +
+							"SELECT ?superscript ?subscript" + NL +
+							"WHERE { \n "+ nameStatement + subQuery + variableQuery + supQuery + valueQuery+" }"
+							+ "GROUP BY ?superscript ?subscript";
+				} else if (ask(nameStatement + subQuery + valueQuery) && !ask(nameStatement + supQuery + valueQuery)){
+					throw new UndeterminedDimensionException();
+				} else {
+					throw new UndeterminedDimensionException();
+				}
+
+				Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
+				QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+				ResultSet rs = qexec.execSelect();
+
+				for ( ; rs.hasNext() ; ){
+					QuerySolution rb = rs.nextSolution() ;
+					LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
+					LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
+					System.out.println("(" + factors.get(index) + "_" + z.getString() + ")^" + y.getString());
+					dimension = findDimension(factors.get(index) + "_" + z.getString(), systemOfUnits);
+					if (y.getInt()==y.getDouble()) {
+						for (int k = 1; k < y.getInt(); k++) {
+							dimension = dimension.multiply(dimension);
+						} 
+					} else {
+						//decimal exponent - what does this mean for dimensions?
+						throw new UndeterminedDimensionException();
+					}
+					dimensionsToMultiply.add(dimension);
+				}
+				qexec.close() ;
+
+
+			} else if(!subscriptPresent && superscriptPresent) {
+				String queryString;
+				if (ask(nameStatement + supQuery + valueQuery)){
+					queryString =   prefixes + NL +
+							"SELECT ?superscript " + NL +
+							"WHERE { \n "+ nameStatement + supQuery + valueQuery+" }";
+				} else {
+					throw new UndeterminedDimensionException();
+				}
+				
+				Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
+				QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+				ResultSet rs = qexec.execSelect();
+
+				for ( ; rs.hasNext() ; ){
+					QuerySolution rb = rs.nextSolution() ;
+					LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
+					System.out.println(factors.get(index) +"^" + y.getString());
+					dimension = findDimension(factors.get(index), systemOfUnits);
+					if (y.getInt()==y.getDouble()) {
+						for (int k = 1; k < y.getInt(); k++) {
+							dimension = dimension.multiply(dimension);
+						} 
+					} else {
+						//decimal exponent - what does this mean for dimensions?
+						throw new UndeterminedDimensionException();
+					}
+					dimensionsToMultiply.add(dimension);
+				}
+				qexec.close() ;
+
+			}else if(subscriptPresent && !superscriptPresent) {				
+				String queryString;
+				if(ask(nameStatement + subQuery + valueQuery)){
+					queryString =   prefixes + NL +
+							"SELECT ?subscript" + NL +
+							"WHERE { \n "+ nameStatement + subQuery + valueQuery + " }";
+				} else {
+					queryString =   prefixes + NL +
+							"SELECT ?subscript" + NL +
+							"WHERE { \n "+ nameStatement + subQuery + variableQuery +" }";
+				} 
+				Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
+				QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+				ResultSet rs = qexec.execSelect();
+
+				for ( ; rs.hasNext() ; ){
+					QuerySolution rb = rs.nextSolution() ;
+					LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
+					dimension = findDimension(factors.get(index) + "_" + z.getString(), systemOfUnits);
+					dimensionsToMultiply.add(dimension);
+				}
+				qexec.close() ;
+				
+			} else {
+				dimension = findDimension(factors.get(index), systemOfUnits);
+				dimensionsToMultiply.add(dimension);
+			}
+		}	
+		
+		if(dimensionsToMultiply.size()>0) {
+			finalDimension = dimensionsToMultiply.get(0);
+			for(int i=1; i<dimensionsToMultiply.size(); i++) {
+				finalDimension = dimensionsToMultiply.get(i).multiply(finalDimension);
+			}
+		} else {
+			finalDimension = new SIDimension();
+		}
+		
+		return finalDimension;
+	}
+	
+	public Dimension findDimension(String factor, String systemOfUnits) {
+		Dimension dimension;
+		String unit = null;;
+		
+		String queryString04 = prefixes + NL  + "SELECT ?dimension" + NL  + 
+				"WHERE {:" + factor + " :hasUnits" + " ?dimension}";
+		Query query04 = QueryFactory.create(queryString04);
+		QueryExecution qexec04 = QueryExecutionFactory.create(query04, ontologyModel);
+		ResultSet factorDimension = qexec04.execSelect();
+		for (; factorDimension.hasNext() ;) {
+			QuerySolution rb3 = factorDimension.nextSolution();
+			Resource x3 = (Resource) rb3.getResource("dimension");
+			unit = x3.getLocalName();
+		}
+		System.out.println(factor);
+		qexec04.close();
+		
+		switch (systemOfUnits) {
+		case "US" :
+			dimension = new USDimension(unit);
+			break;
+		case "Planck":
+			dimension = new PlanckDimension(unit);
+			break;
+		case "CGS" :
+			dimension=new CGSDimension(unit);
+			break;
+		default :
+			dimension = new SIDimension(unit);	
+		}
+		
+		return dimension;
+	}
+
+	//find the dimension vector of one side of an equation w/ default SI units
+	public Dimension totalDimension(String start) {
+		return totalDimension(start, "SI");
+	}
+
+	//find the dimension vector of one side of an equation given starting String and system of units
+	public Dimension totalDimension(String start, String systemOfUnits) { 
+		/*
+		 * the parameter 'start' must end with a lone subject (i.e; _:a :hasUnits _:b. \n _:b ) 
+		 */
+		
+		Dimension finalDimension;	
+		Dimension termDimension; //each time the do-while loop iterates the termDimension is re-written and the new value added to the terms ArrayList
+		
+		switch (systemOfUnits) {
+		case "US" :
+			finalDimension = new USDimension();
+			termDimension = new USDimension();
+			break;
+		case "Planck":
+			finalDimension = new PlanckDimension();
+			termDimension = new PlanckDimension();
+			break;
+		case "CGS" :
+			finalDimension=new CGSDimension();
+			termDimension=new CGSDimension();
+			break;
+		default :
+			finalDimension = new SIDimension();	
+			termDimension = new SIDimension();	
+		}
+		
+	
+		String variableQuery = "mfi:hasFactor _:d . \n "
+						+ "_:d mfi:hasVariable _:n ."
+				+ "_:n mfi:hasName ?name .";
+		String fractionQuery = " mfi:hasFactor _:d . \n "
+						+ "_:d mfi:hasFraction _:k . \n";			
+		String valueQuery = " mfi:hasValue _:o .\n"
+				+ "_:o mfi:hasValue ?value .";
+		
+		String denomQuery = " mfi:hasFraction _:k . \n"
+				+ "_:k mfi:hasDenominator _:l . \n"
+				+ "_:l ";
+		String numQuery = " mfi:hasFraction _:k . \n"
+				+ "_:k mfi:hasNumerator _:m . \n"
+				+ "_:m ";
+	
+		//String nameStatement; //customized query w name of each factor
+		//String checkSubscript; //query to check for presence of subscript to factor
+		//String checkSuperscript; //query to check for presence of superscript to factor	
+			
+		ArrayList<Dimension> terms = new ArrayList<Dimension>(); //list of terms in an expression
+	
+		String nameQuery;
+		Boolean hasPlus=false;
+		Boolean hasMinus=false;
+		
+			//expression or term?
+			String expressionQuery = start + "mfi:hasExpression";
+			Boolean isExpression = ask(expressionQuery);
+			
+			if(isExpression) {
+				nameQuery = start
+						+"mfi:hasExpression _:x .\n "
+						+ " _:x mfi:hasTerm _:c . \n" + 
+						" _:c ";
+	
+				String plusOpQuery = start + "  mfi:plusOp _:c . ";
+				String minusOpQuery = start + "  mfi:minusOp _:c . ";
+				hasPlus=ask(plusOpQuery);
+				hasMinus=ask(minusOpQuery);
+				
+			} else {
+				nameQuery = start
+						+ " mfi:hasTerm _:c . \n" + 
+						" _:c mfi:hasFactor _:d . \n"
+						+ "_:d ";
+			}	
+			
+			//VARIABLE	
+			if (ask(prefixes + NL + "ASK { " + nameQuery + variableQuery + "}")){
+				ArrayList<String> factors = new ArrayList<String>(); //list of factors of each side of the equation	
+				
+				//query to create list of names of multiplied factors in equation
+				String queryString =   prefixes + NL +
+						"SELECT ?name " + NL +
+						"WHERE { \n " + nameQuery + variableQuery + "\n }";
+				Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
+				QueryExecution qexec = QueryExecutionFactory.create(query, myModel);
+				ResultSet names = qexec.execSelect();
+				for (; names.hasNext() ; ) {
+					QuerySolution rb = names.nextSolution();
+					LiteralImpl x = (LiteralImpl) rb.getLiteral("name");
+					factors.add(x.getString());
+				}
+				qexec.close();
+				
+				termDimension = termDimension(factors, systemOfUnits);
+			
+			//FRACTION
+			}else if (ask(prefixes + NL + "ASK {" + nameQuery + fractionQuery + "}")){
+				String numStart = nameQuery + numQuery;
+				String denomStart = nameQuery + denomQuery;
+				
+				Dimension numDimension = totalDimension(numStart, systemOfUnits);
+				Dimension denomDimension = totalDimension(denomStart, systemOfUnits);
+				
+				//divide dimensions to get termDimension 
+				termDimension = numDimension.divide(denomDimension);				
+
+				//VALUE	
+			} else if (ask(nameQuery + valueQuery)){
+				System.out.println("term is a constant");
+				termDimension = new SIDimension("Unitless");
+				//NO MATCH- BAD
+			} else {
+				System.out.println("not good, not good");
+			}
+			terms.add(termDimension);
+			if (hasPlus) {
+				String otherTermQuery = start + " mfi:plusOp _:c .\n _:c ";
+				terms.add(totalDimension(otherTermQuery, systemOfUnits));
+			} else if (hasMinus) {
+				String otherTermQuery = start + " mfi:minusOp _:c .\n _:c ";
+				terms.add(totalDimension(otherTermQuery, systemOfUnits));
+			}
+
+			if(terms.size()>0) {
+				finalDimension = terms.get(0);
+				for(int i=1; i<terms.size(); i++) {
+				if(terms.get(i).equals(terms.get(i-1))) {
+					continue;
+				} else {
+					throw new UndeterminedDimensionException();
+				}
+			}
+		} 
+		
+		return finalDimension;	
+	}
+	
+	public String testThing(String beginning, int index) {
+		String factorName=null;
+		String[] alphabet = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","z","y"};
+		String node = " _:"+alphabet[index]+" . \n _:"+alphabet[index]+" ";
+		String queryString = prefixes + NL 
+				+ "SELECT ?predicate ?node \n"
+				+ "WHERE {"+beginning+" ?predicate ?node }";
+		Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
+		QueryExecution qexec = QueryExecutionFactory.create(query, myModel);
+		ResultSet names = qexec.execSelect();
+		for (; names.hasNext() ; ) {
+			QuerySolution rb = names.nextSolution();
+			Resource x = (Resource) rb.getResource("predicate");
+			String property = x.getLocalName();
+			
+			if(property.equals("hasExpression")) {
+				index++;
+				testThing(beginning + "mfi:hasExpression "+node, index );
+				
+			} else if(property.equals("hasTerm")) {
+				index++;
+				testThing(beginning + "mfi:hasTerm "+node, index);
+				
+			} else if(property.equals("hasFactor")) {
+				index++;
+				testThing(beginning + "mfi:hasFactor"+node, index);
+				
+			} else if(property.equals("hasVariable")) {
+				index++;
+				testThing(beginning + "mfi:hasVariable "+node, index);
+				
+			} else if(property.equals("hasName")) {
+				index++;
+				LiteralImpl y = (LiteralImpl) rb.getLiteral("node");
+				factorName = y.getString();
+				
+			} else if(property.equals("hasValue")) {
+				String queryString01 = prefixes + NL 
+						+ "SELECT ?value \n"
+						+ "WHERE {"+beginning+" mfi:hasValue" + node + " mfi:hasValue ?value }";
+				Query query01 = QueryFactory.create(queryString01, Syntax.syntaxSPARQL);
+				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel);
+				ResultSet values = qexec01.execSelect();
+				for (; values.hasNext() ; ) {
+					QuerySolution rb01 = values.nextSolution();
+					LiteralImpl y = (LiteralImpl) rb01.getLiteral("value");
+					System.out.println("Dimensionless with value " + y.getDouble());
+					factorName = y.toString();
+				}				
+				
+			} else if(property.equals("hasFraction")) {
+				index++;
+				testThing(beginning + "mfi:hasFraction "+node, index);
+				
+			} else if(property.equals("hasNumerator")) {
+				index++;
+				testThing(beginning + "mfi:hasNumerator "+node, index);
+				
+			} else if(property.equals("hasDenominator")) {
+				index++;
+				testThing(beginning + "mfi:hasDenominator "+node, index);
+				
+			} else if(property.equals("hasAnnotationExp")) {
+				index++;
+				testThing(beginning + "mfi:hasAnnotationExp "+node, index);
+				
+			} else if(property.equals("hasAnnotation")) {
+				index++;
+				LiteralImpl y = (LiteralImpl) rb.getLiteral("node");
+				factorName = y.getString();
+				
+			} else if(property.equals("hasSubscript")) {
+				index++;
+				testThing(beginning + "mfi:hasSubscript "+node, index);
+				
+			} else if(property.equals("hasSuperscript")) {
+				index++;
+				testThing(beginning + "mfi:hasSuperscript "+node, index);
+				
+			} else {
+				System.out.println("Property not recognized");
+				
+			}			
+		}
+		qexec.close();
+		
+		return factorName;
 	}
 }
 

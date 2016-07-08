@@ -64,9 +64,9 @@ public class EquationValidator {
 			Property inconsistencyCause = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#inconsistencyCause");
 			
 			
-			Property hasSystemOfUnits = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasSystemOfUnits");
-			Property hasRHS = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionVector");
-			Property hasLHS = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionVector");
+			//Property hasSystemOfUnits = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasSystemOfUnits");
+			//Property hasRHS = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionVector");
+			//Property hasLHS = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionVector");
 			
 			
 			Resource a = tempModel.createResource("http://modelmeth.nist.gov/manufacturing#" + nameURI.get(i) + "RHS");
@@ -78,9 +78,13 @@ public class EquationValidator {
 				
 			
 			try 
-			{			
-				dimLHS = equationID.findDimensionality(nameURI.get(i), "hasLHS", systemOfUnits);	
-				dimRHS = equationID.findDimensionality(nameURI.get(i), "hasRHS", systemOfUnits);
+			{	
+				String equationLHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:a . \n "
+						+ "_:a mfi:hasLHS _:b .\n _:b ";
+				String equationRHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:a . \n "
+						+ "_:a mfi:hasRHS _:b .\n _:b ";
+				dimLHS = equationID.totalDimension(equationLHS, systemOfUnits);	
+				dimRHS = equationID.totalDimension(equationRHS, systemOfUnits);
 				
 				System.out.println("EQUATION URI: " + nameURI.get(i));
 				System.out.println();
