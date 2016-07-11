@@ -582,7 +582,7 @@ public class Identifier {
 	}
 
 	
-	public String testThing(String beginning, int index) {
+	public Stringmension testThing(String beginning, int index) {		 
 		String factorName=null;
 		String systemOfUnits = "SI"; 
 		Dimension dimension = new SIDimension();
@@ -602,28 +602,31 @@ public class Identifier {
 			
 			if(property.equals("hasExpression")) {
 				index++;
-				factorName = testThing(beginning + "mfi:hasExpression "+node, index ); 
+				factorName = testThing(beginning + "mfi:hasExpression "+node, index ).factorName; 
 				
 			} else if(property.equals("hasTerm")) {
 				index++;
 				Resource y = (Resource) rb.getResource("node");
 				String termName = y.getLocalName();
-				factorName = testThing(beginning + "mfi:hasTerm " + termName + ". \n " + termName, index);
+				factorName = testThing(beginning + "mfi:hasTerm " + termName + ". \n " 
+				+ termName, index).factorName;
 				
 			} else if(property.equals("hasFactor")) {
 				index++;
-				factorName = testThing(beginning + "mfi:hasFactor"+node, index);
+				factorName = testThing(beginning + "mfi:hasFactor"+node, index).factorName;
 				
 			} else if(property.equals("hasVariable")) {
 				index++;
-				factorName = testThing(beginning + " mfi:hasVariable "+node, index);
-				//aslways followed by mfi:hasName "__"^^xsd:string 
+				factorName = testThing(beginning + " mfi:hasVariable "+node, index).factorName;
+				//always followed by mfi:hasName "__"^^xsd:string 
 				
 			} else if(property.equals("hasFraction")) {
 				index++;
 				
-				String num = testThing(beginning + " mfi:hasFraction ?a . \n ?a mfi:hasNumerator" + node, index);
-				String den = testThing(beginning + " mfi:hasFraction ?a . \n ?a mfi:hasDenominator" + node, index);
+				String num = testThing(beginning + " mfi:hasFraction ?a . \n ?a mfi:hasNumerator" 
+				+ node, index).factorName;
+				String den = testThing(beginning + " mfi:hasFraction ?a . \n ?a mfi:hasDenominator" 
+				+ node, index).factorName;
 				
 				Dimension numerator=factorDimension(num, systemOfUnits);	
 				Dimension denominator=factorDimension(den, systemOfUnits);
@@ -652,19 +655,19 @@ public class Identifier {
 					LiteralImpl y = (LiteralImpl) rb01.getLiteral("value");
 					factorName = y.toString();
 				}	
-				factorName = testThing(beginning + "mfi:hasFraction "+node, index);
+				factorName = testThing(beginning + "mfi:hasFraction "+node, index).factorName;
 				
 			} else if(property.equals("hasNumerator")) {
 				index++;
-				factorName = testThing(beginning + "mfi:hasNumerator "+node, index);
+				factorName = testThing(beginning + "mfi:hasNumerator "+node, index).factorName;
 				
 			} else if(property.equals("hasDenominator")) {
 				index++;
-				factorName = testThing(beginning + "mfi:hasDenominator "+node, index);
+				factorName = testThing(beginning + "mfi:hasDenominator "+node, index).factorName;
 				
 			} else if(property.equals("hasAnnotationExp")) {
 				index++;
-				factorName = testThing(beginning + "mfi:hasAnnotationExp "+node, index);
+				factorName = testThing(beginning + "mfi:hasAnnotationExp "+node, index).factorName;
 				//always followed by mfi:hasAnnotation "__"^^xsd:string and
 				//mfi:hasExpression [mfi:hasTerm ....
 				
@@ -678,7 +681,7 @@ public class Identifier {
 				index++;
 				LiteralImpl y = (LiteralImpl) rb.getLiteral("node");
 				String annotation = y.getString();
-				factorName ="\\" + annotation + "\\" + testThing(beginning + "mfi:hasExpression "+node, index );
+				factorName ="\\" + annotation + "\\" + testThing(beginning + "mfi:hasExpression "+node, index ).factorName;
 				
 			} else if(property.equals("hasValue")) {
 				String queryString01 = prefixes + NL 
@@ -701,11 +704,13 @@ public class Identifier {
 		}
 		qexec.close();
 		
-		return factorName;
+		Stringmension answer = new Stringmension(factorName, dimension);
+		
+		return answer;
 	}
 	
 	public Dimension factorDimension(String factor, String systemOfUnits) {
-		Dimension dimension = new SIDimension(); 
+		Dimension dimension = new SIDimension();
 
 		String variableQuery = " mfi:hasVariable _:n ."
 				+ "_:n mfi:hasName ?name .";		
