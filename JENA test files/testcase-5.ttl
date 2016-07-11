@@ -1,6 +1,7 @@
 @prefix mfi:   <http://modelmeth.nist.gov/mfi/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix gov: 	<http://gov.nist.modelmeth/>.
 
 _:b0    mfi:hasVariable  [ a            mfi:Variable ;
                            mfi:hasName  "i"^^xsd:string
@@ -68,10 +69,10 @@ _:b1    mfi:hasValue  [ a             mfi:LiteralNumber ;
                                                                       ] ;
                                                   mfi:hasNumerator    [ a                  mfi:Expression ;
                                                                         mfi:hasExpression  [ a            mfi:Expression ;
-                                                                                             mfi:hasTerm  <http://gov.nist.modelmeth/term134339>
-                                                                                           ] ;
-                                                                        mfi:hasTerm        <http://gov.nist.modelmeth/term134332> ;
-                                                                        mfi:minusOp        <http://gov.nist.modelmeth/term134332>
+                                                                                             mfi:hasTerm  <http://gov.nist.modelmeth/term134339>;
+																							 mfi:hasTerm        <http://gov.nist.modelmeth/term134332> ;
+																							 mfi:minusOp        <http://gov.nist.modelmeth/term134332>
+																							] ;
                                                                       ]
                                                 ]
                           ] ;
@@ -103,10 +104,10 @@ mfi:realURI  a            mfi:MathContent ;
                                                  ] ;
                             mfi:hasRHS           [ a                  mfi:Expression ;
                                                    mfi:hasExpression  [ a            mfi:Expression ;
-                                                                        mfi:hasTerm  <http://gov.nist.modelmeth/term134347>
-                                                                      ] ;
-                                                   mfi:hasTerm        <http://gov.nist.modelmeth/term134328> ;
-                                                   mfi:plusOp         <http://gov.nist.modelmeth/term134328>
+                                                                        mfi:hasTerm  		<http://gov.nist.modelmeth/term134347>;
+																		mfi:hasTerm        <http://gov.nist.modelmeth/term134328> ;
+																		mfi:plusOp         <http://gov.nist.modelmeth/term134328>
+																	] ;
                                                  ] ;
                             mfi:hasRelationalOp  mfi:eq
                           ] .

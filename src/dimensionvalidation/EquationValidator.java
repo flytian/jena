@@ -22,12 +22,14 @@ public class EquationValidator {
 		
 		String prefixString = "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + NL + 
 				"PREFIX : <http://modelmeth.nist.gov/manufacturing#>" + NL + 
-				"PREFIX mfi:  <http://modelmeth.nist.gov/mfi#>" + NL + 
-				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";		//ontology prefixes
+				"PREFIX mfi:  <http://modelmeth.nist.gov/mfi/>" + NL + 
+				"PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + NL +
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + NL + 
+				"PREFIX gov:	<http://gov.nist.modelmeth/> ";		//ontology prefixes
 		
 		Model manufacturingOntology = RDFDataMgr.loadModel("manufacturing.ttl"); //ontology defining the quantity of each variable
 		Model notebookTriples = RDFDataMgr.loadModel("temp-doc-turning-triples.ttl");
-		Model equationModel = RDFDataMgr.loadModel("testcase-5.ttl"); //ontology containing the Turtle code for each equation
+		Model equationModel = RDFDataMgr.loadModel("testcase-7.ttl"); //ontology containing the Turtle code for each equation
 		
 		Model ontologyModel = ModelFactory.createDefaultModel();
 		ontologyModel.add(manufacturingOntology);
@@ -40,7 +42,13 @@ public class EquationValidator {
 		Identifier equationID = new Identifier(equationModel, ontologyModel, prefixString);
 		
 		ArrayList<String> nameURI = equationID.findSubject("a", "mfi:MathContent"); //list of all equation URIs in the ontology
+		
+		System.out.println(nameURI.toString());
+		System.out.println();
 
+		Stringmension one;
+		Stringmension two;
+		
 		Dimension dimLHS; //dimension of the RHS of each equation
 		Dimension dimRHS; //dimension of the LHS of each equation
 		
@@ -79,15 +87,21 @@ public class EquationValidator {
 			
 			try 
 			{	
-				String equationLHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:a . \n "
-						+ "_:a mfi:hasLHS _:b .\n _:b ";
-				String equationRHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:a . \n "
-						+ "_:a mfi:hasRHS _:b .\n _:b ";
-				dimLHS = equationID.totalDimension(equationLHS, systemOfUnits);	
-				dimRHS = equationID.totalDimension(equationRHS, systemOfUnits);
+				String equationLHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:X . \n "
+						+ "_:X mfi:hasLHS _:Y .\n _:Y ";
+				String equationRHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:X . \n "
+						+ "_:X mfi:hasRHS _:Y .\n _:Y ";
 				
 				System.out.println("EQUATION URI: " + nameURI.get(i));
 				System.out.println();
+				
+				one = equationID.totalDimension(equationLHS, 0);
+				two=equationID.totalDimension(equationRHS, 0);
+				
+				dimLHS = one.dimension;
+				dimRHS = two.dimension;
+				//dimLHS=new SIDimension("Millimeter");
+			
 				System.out.println("RHS Dimensions: " + dimRHS.toString());
 				System.out.println();
 				System.out.println("LHS Dimensions: " + dimLHS.toString());

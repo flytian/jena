@@ -95,7 +95,7 @@ _:b2    mfi:hasVariable  [ a            mfi:Variable ;
                            mfi:hasName  "i"^^xsd:string
                          ] .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI001  a            mfi:MathContent ;
         mfi:hasLaTeXText  " d_i = \\frac{D_0 - D}{2} + \\delta_i "^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -164,7 +164,7 @@ _:b2    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI002  a            mfi:MathContent ;
         mfi:hasLaTeXText  "\\bar{D_i} = ( D_0 - d_i )"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -286,7 +286,7 @@ _:b0    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI003  a            mfi:MathContent ;
         mfi:hasLaTeXText  " t_{c,i} = \\frac{\\pi \\bar{D_i} L}{1000Vf} "^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -327,7 +327,7 @@ mfi:realURI  a            mfi:MathContent ;
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-mfi:realURI  a            mfi:Error ;
+mfi:realURI004  a            mfi:Error ;
         mfi:hasLaTeXText  "T_n = \\sum\\limits_{i=1}^n t_{c,i}"^^xsd:string ;
         mfi:hasMessage    "expected: } got: gov.nist.mfi.Symbol@93b391d0"^^xsd:string .
 
@@ -349,7 +349,7 @@ mfi:realURI  a            mfi:Error ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI005  a            mfi:MathContent ;
         mfi:hasLaTeXText  "w = k_wV^{\\alpha_w}f^{\\beta_w}d^{\\gamma_w}t^{\\sigma_w}"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -546,7 +546,7 @@ _:b4    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI006  a            mfi:MathContent ;
         mfi:hasLaTeXText  "w_i = k_w V^{\\alpha_w} f^{\\beta_w} d_i^{\\gamma_w} (t_{w,i} + t)^{\\sigma_w}"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -724,7 +724,7 @@ _:b6    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI007  a            mfi:MathContent ;
         mfi:hasLaTeXText  "0 \\le t \\le t_{c,i}"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -869,7 +869,7 @@ _:b2    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI008  a            mfi:MathContent ;
         mfi:hasLaTeXText  " t_{w,i} = (\\frac{1}{k_w} V^{-\\alpha_w} f^{-\\beta_w} d_i^{-\\gamma_w} W_{i-1})^{\\frac{1}{\\sigma_w}} "^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -1023,7 +1023,7 @@ _:b1    mfi:hasVariable  [ a                   mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a             mfi:MathContent ;
+mfi:realURI0009  a             mfi:MathContent ;
         mfi:hasExpression  [ a            mfi:Expression ;
                              mfi:hasTerm  <http://gov.nist.modelmeth/term134636>
                            ] ;
@@ -1059,7 +1059,7 @@ mfi:realURI  a             mfi:MathContent ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a             mfi:MathContent ;
+mfi:realURI0010  a             mfi:MathContent ;
         mfi:hasExpression  [ a                  mfi:Expression ;
                              mfi:hasExpression  [ a            mfi:Expression ;
                                                   mfi:hasTerm  <http://gov.nist.modelmeth/term134652>
@@ -1113,7 +1113,7 @@ _:b0    mfi:hasVariable  [ a            mfi:Variable ;
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI0011  a            mfi:MathContent ;
         mfi:hasLaTeXText  "\\Delta_i = 2(w_i - W_{i-1})tan(\\Theta)"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -1248,7 +1248,7 @@ _:b1    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI0012  a            mfi:MathContent ;
         mfi:hasLaTeXText  "0 \\le t \\le t_{c,i}"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -1324,7 +1324,7 @@ _:b2    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI0013  a            mfi:MathContent ;
         mfi:hasLaTeXText  "\\Phi_i = k_r V^{\\alpha_r} f^{\\beta_r} d_i^{\\gamma_r}(t_{w,i} + t)^{\\sigma_r}"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -1540,7 +1540,7 @@ _:b1    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI0014  a            mfi:MathContent ;
         mfi:hasLaTeXText  " F_i = k_c V^{\\alpha_c} f^{\\beta_c} d_i^{\\gamma_c}(t_{w,i} + t)^{\\sigma_c}"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -1732,7 +1732,7 @@ _:b0    mfi:hasVariable  [ a            mfi:Variable ;
                            mfi:hasName  "w"^^xsd:string
                          ] .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI0015  a            mfi:MathContent ;
         mfi:hasLaTeXText  " DC = N C_h t_h + (C_w + C_z) T_N"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
@@ -1884,7 +1884,7 @@ _:b3    mfi:hasVariable  [ a            mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI  a            mfi:MathContent ;
+mfi:realURI0016  a            mfi:MathContent ;
         mfi:hasLaTeXText  "P = E - (DC + GC + QC)"^^xsd:string ;
         mfi:hasRelation   [ a                    mfi:Relation ;
                             mfi:hasLHS           [ a            mfi:Expression ;
