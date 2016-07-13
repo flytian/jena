@@ -1,0 +1,37 @@
+## realURI007, almost identical to realURI0012
+
+@prefix mfi:   <http://modelmeth.nist.gov/mfi/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://gov.nist.modelmeth/term134539>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasValue        [ a             mfi:LiteralNumber ;
+                                                  mfi:hasValue  "0"^^xsd:decimal
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+<http://gov.nist.modelmeth/term134543>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "t"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+mfi:realURI007  a            mfi:MathContent ;
+        mfi:hasLaTeXText  "0 \\le t \\le t_{c,i}"^^xsd:string ;
+        mfi:hasRelation   [ a                    mfi:Relation ;
+                            mfi:hasLHS           [ a            mfi:Expression ;
+                                                   mfi:hasTerm  <http://gov.nist.modelmeth/term134539>
+                                                 ] ;
+                            mfi:hasRHS           [ a            mfi:Expression ;
+                                                   mfi:hasTerm  <http://gov.nist.modelmeth/term134543>
+                                                 ] ;
+                            mfi:hasRelationalOp  mfi:le
+                          ] .

@@ -1,0 +1,155 @@
+### realURI 005 (nearly identical to 006, 008, 0013, 0014)
+
+@prefix mfi:   <http://modelmeth.nist.gov/mfi/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://gov.nist.modelmeth/term134431>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                 mfi:Variable ;
+                                                  mfi:hasName       "alpha"^^xsd:string ;
+                                                  mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                      mfi:hasExpression  _:b0 ;
+                                                                      mfi:hasFactor      _:b0
+                                                                    ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+mfi:realURI005  a            mfi:MathContent ;
+        mfi:hasLaTeXText  "w = k_wV^{\\alpha_w}f^{\\beta_w}d^{\\gamma_w}t^{\\sigma_w}"^^xsd:string ;
+        mfi:hasRelation   [ a                    mfi:Relation ;
+                            mfi:hasLHS           [ a            mfi:Expression ;
+                                                   mfi:hasTerm  <http://gov.nist.modelmeth/term134419>
+                                                 ] ;
+                            mfi:hasRHS           [ a            mfi:Expression ;
+                                                   mfi:hasTerm  <http://gov.nist.modelmeth/term134423>
+                                                 ] ;
+                            mfi:hasRelationalOp  mfi:eq
+                          ] .
+
+_:b0    mfi:hasVariable  [ a            mfi:Variable ;
+                           mfi:hasName  "w"^^xsd:string
+                         ] .
+
+<http://gov.nist.modelmeth/term134451>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                 mfi:Variable ;
+                                                  mfi:hasName       "gamma"^^xsd:string ;
+                                                  mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                      mfi:hasExpression  _:b1 ;
+                                                                      mfi:hasFactor      _:b1
+                                                                    ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+<http://gov.nist.modelmeth/term134423>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "4"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                   mfi:Variable ;
+                                                  mfi:hasName         "t"^^xsd:string ;
+                                                  mfi:hasSuperscript  [ a                  mfi:Superscript ;
+                                                                        mfi:hasExpression  [ a            mfi:Expression ;
+                                                                                             mfi:hasTerm  <http://gov.nist.modelmeth/term134461>
+                                                                                           ]
+                                                                      ]
+                                                ]
+                          ] ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "3"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                   mfi:Variable ;
+                                                  mfi:hasName         "d"^^xsd:string ;
+                                                  mfi:hasSuperscript  [ a                  mfi:Superscript ;
+                                                                        mfi:hasExpression  [ a            mfi:Expression ;
+                                                                                             mfi:hasTerm  <http://gov.nist.modelmeth/term134451>
+                                                                                           ]
+                                                                      ]
+                                                ]
+                          ] ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "2"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                   mfi:Variable ;
+                                                  mfi:hasName         "f"^^xsd:string ;
+                                                  mfi:hasSuperscript  [ a                  mfi:Superscript ;
+                                                                        mfi:hasExpression  [ a            mfi:Expression ;
+                                                                                             mfi:hasTerm  <http://gov.nist.modelmeth/term134441>
+                                                                                           ]
+                                                                      ]
+                                                ]
+                          ] ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                 mfi:Variable ;
+                                                  mfi:hasName       "k"^^xsd:string ;
+                                                  mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                      mfi:hasExpression  _:b2 ;
+                                                                      mfi:hasFactor      _:b2
+                                                                    ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+_:b1    mfi:hasVariable  [ a            mfi:Variable ;
+                           mfi:hasName  "w"^^xsd:string
+                         ] .
+
+_:b2    mfi:hasVariable  [ a                   mfi:Variable ;
+                           mfi:hasName         "wV"^^xsd:string ;
+                           mfi:hasSuperscript  [ a                  mfi:Superscript ;
+                                                 mfi:hasExpression  [ a            mfi:Expression ;
+                                                                      mfi:hasTerm  <http://gov.nist.modelmeth/term134431>
+                                                                    ]
+                                               ]
+                         ] .
+
+<http://gov.nist.modelmeth/term134419>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "w"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+<http://gov.nist.modelmeth/term134441>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                 mfi:Variable ;
+                                                  mfi:hasName       "beta"^^xsd:string ;
+                                                  mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                      mfi:hasExpression  _:b3 ;
+                                                                      mfi:hasFactor      _:b3
+                                                                    ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+_:b3    mfi:hasVariable  [ a            mfi:Variable ;
+                           mfi:hasName  "w"^^xsd:string
+                         ] .
+
+<http://gov.nist.modelmeth/term134461>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                 mfi:Variable ;
+                                                  mfi:hasName       "sigma"^^xsd:string ;
+                                                  mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                      mfi:hasExpression  _:b4 ;
+                                                                      mfi:hasFactor      _:b4
+                                                                    ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+_:b4    mfi:hasVariable  [ a            mfi:Variable ;
+                           mfi:hasName  "w"^^xsd:string
+                         ] .

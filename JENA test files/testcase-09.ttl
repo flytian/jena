@@ -1,0 +1,34 @@
+### realURI 009
+
+@prefix mfi:   <http://modelmeth.nist.gov/mfi/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://gov.nist.modelmeth/term134640>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "N"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+mfi:realURI009  a             mfi:MathContent ;
+        mfi:hasExpression  [ a            mfi:Expression ;
+                             mfi:hasTerm  <http://gov.nist.modelmeth/term134636>
+                           ] ;
+        mfi:hasLaTeXText   "\\hat{N}"^^xsd:string .
+
+<http://gov.nist.modelmeth/term134636>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                     mfi:Factor ;
+                            mfi:hasAnnotationExp  [ a                  mfi:AnnotatedExpression ;
+                                                    mfi:hasAnnotation  "hat"^^xsd:string ;
+                                                    mfi:hasExpression  [ a            mfi:Expression ;
+                                                                         mfi:hasTerm  <http://gov.nist.modelmeth/term134640>
+                                                                       ]
+                                                  ] ;
+                            mfi:hasFactorOrder    "1"^^xsd:nonNegativeInteger
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .

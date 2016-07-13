@@ -132,6 +132,394 @@ public class Identifier {
 		return objects;
 	}
 
+	//performs a SPARQL ASK query for the given String
+	public Boolean ask(String askQuery) {
+		String queryString = prefixes + NL + "ASK { " + askQuery + "}";
+		Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
+		QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+		Boolean answer = qexec.execAsk();
+		qexec.close();
+
+		return answer;
+	}
+	
+	//totalDimension method with default SI units 
+	public Stringmension totalDimension(String beginning, int index) {
+		return totalDimension(beginning, index, "SI");
+	}
+	
+	//returns the name and dimension of one side of an equation
+	public Stringmension totalDimension(String beginning, int index, String systemOfUnits) {		 
+		String factorName=null; 
+		Dimension dimension;
+		Stringmension temp;
+		Dimension finalDimension = new SIDimension();
+		String property=null;
+		ArrayList<Dimension> factorDim = new ArrayList<Dimension>();
+		ArrayList<Dimension> termDim = new ArrayList<Dimension>();
+		String[] alphabet = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","z","y"};
+		String node = " _:"+alphabet[index]+" . \n _:"+alphabet[index]+" ";
+		String queryString = prefixes + NL 
+				+ "SELECT DISTINCT ?predicate \n"
+				+ "WHERE {"+beginning+" ?predicate ?node \n"
+						+ " FILTER (?predicate != rdf:type ) \n"
+						+ "FILTER (?predicate != mfi:hasFactorOrder ) \n }";
+		//System.out.println();
+		//System.out.println(queryString);
+		Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
+		//query.serialize(new IndentedWriter(System.out,true)) ;
+		
+		QueryExecution qexec = QueryExecutionFactory.create(query, myModel);
+		ResultSet names = qexec.execSelect();
+		for (; names.hasNext() ; ) {
+			QuerySolution rb = names.nextSolution();
+			Resource x = (Resource) rb.getResource("predicate");
+			property = x.getLocalName();
+			
+			if(property.equals("hasExpression")) {
+				//System.out.println(property);
+				index++;
+				String beginningExp=beginning + "mfi:hasExpression "+node;
+				temp=totalDimension(beginningExp, index , systemOfUnits);
+				factorName = temp.factorName; 
+				dimension=temp.dimension;
+				factorDim.add(dimension);
+				
+			} else if(property.equals("hasTerm")) {
+				index++;
+				String termName="";
+				
+				String queryString01 = prefixes + NL 
+						+ "SELECT ?term \n"
+						+ "WHERE {"+beginning+" mfi:hasTerm ?term }";
+				Query query01 = QueryFactory.create(queryString01, Syntax.syntaxSPARQL);
+				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel);
+				ResultSet values = qexec01.execSelect();
+				for (; values.hasNext() ; ) {
+					QuerySolution rb01 = values.nextSolution();
+					Resource y = (Resource) rb01.getResource("term");
+					termName=y.getLocalName();
+					//System.out.println("termName: "+termName);
+					termName = "gov:" + termName;
+					temp=totalDimension(termName, index, systemOfUnits);
+					factorName = temp.factorName;
+					dimension=temp.dimension;
+					//System.out.println(property + ": " + termName + " dimension: " + dimension);
+					termDim.add(dimension);
+				}
+				qexec01.close();
+				
+				//String termList=null;
+				finalDimension = termDim.get(0);
+				for(int i=0; i<termDim.size()-1; i++) {
+					if(termDim.get(i).equals(termDim.get(i+1))) {
+						//termList = termDim.get(i).getDimensionUnits() + " equals " 
+									//+ termDim.get(i+1).getDimensionUnits();
+						//System.out.println("termDim: " + termDim.size() + " | "+ termList);
+						continue;
+					} else {
+						//System.out.println(termDim.get(i).getDimensionUnits() + " DOES NOT equal " 
+								//+ termDim.get(i+1).getDimensionUnits());
+						throw new UndeterminedDimensionException();
+					}
+				}
+				
+			} else if(property.equals("hasFactor")) {
+				//System.out.println(property);
+				index++;
+				String beginningFac=beginning + " mfi:hasFactor "+node;
+				temp=totalDimension(beginningFac, index, systemOfUnits);
+				factorName = temp.factorName;
+				finalDimension = temp.dimension;
+				//System.out.println("factorDim: " + finalDimension);
+				termDim.add(finalDimension);
+				
+			} else if(property.equals("hasVariable")) {
+				//System.out.println(property);
+				index++;
+				String beginningVar=beginning + " mfi:hasVariable _:Z . \n _:Z ";
+				int prefix=beginning.indexOf("gov:");
+				String term = beginning.substring(prefix+4, prefix+14);
+				//System.out.println(term);
+				
+				String queryString01 = prefixes + NL 
+						+ "SELECT ?name \n"
+						+ "WHERE {"+beginningVar+" mfi:hasName ?name }";
+				Query query01 = QueryFactory.create(queryString01, Syntax.syntaxSPARQL);
+				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel);
+				ResultSet values = qexec01.execSelect();
+				for (; values.hasNext() ; ) {
+					QuerySolution rb01 = values.nextSolution();
+					LiteralImpl y = (LiteralImpl) rb01.getLiteral("name");
+					factorName = y.getString();
+					//System.out.println("hasName: " + factorName);
+					dimension = factorDimension(term, factorName, systemOfUnits);
+					//System.out.println("nameDim: " + dimension);
+					factorDim.add(dimension);
+					//System.out.println();
+				}
+				qexec01.close();
+				
+				
+				
+			} else if(property.equals("hasFraction")) {
+				index++;
+				String beginningNum=beginning + " mfi:hasFraction ?a . \n ?a mfi:hasNumerator " 
+						+ node;
+				Stringmension num = totalDimension(beginningNum, index, systemOfUnits);
+				String beginningDen=beginning + " mfi:hasFraction ?a . \n ?a mfi:hasDenominator " 
+						+ node;
+				Stringmension den = totalDimension(beginningDen, index, systemOfUnits);
+				
+				Dimension numerator=num.dimension;	
+				//System.out.println("numerator: "+numerator);
+				Dimension denominator=den.dimension;
+				//System.out.println("denominator: "+denominator);
+				dimension = numerator.divide(denominator);	
+				factorName = num.factorName + "/"+ den.factorName;
+				factorDim.add(dimension);
+				
+			} else if(property.equals("hasAnnotationExp")) {
+				//System.out.println(property);
+				index++;
+				String beginningAn = beginning + " mfi:hasAnnotationExp _:Z . \n _:Z ";
+				String annotation="";
+				String queryString01 = prefixes + NL 
+						+ "SELECT ?annotation \n"
+						+ "WHERE {"+beginningAn+" mfi:hasAnnotation ?annotation }";
+				Query query01 = QueryFactory.create(queryString01, Syntax.syntaxSPARQL);
+				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel);
+				ResultSet values = qexec01.execSelect();
+				for (; values.hasNext() ; ) {
+					QuerySolution rb01 = values.nextSolution();
+					LiteralImpl y = (LiteralImpl) rb01.getLiteral("annotation");
+					annotation = y.getString();
+				}
+				qexec01.close();
+				int prefix=beginning.indexOf("gov:");
+				String term = beginning.substring(prefix+4, prefix+14);
+				//System.out.println(annotation +", "+term);
+				beginningAn=beginningAn + " mfi:hasExpression "+node;
+				temp=totalDimension(beginningAn, index, systemOfUnits);
+				dimension = factorDimension(term, temp.factorName, systemOfUnits);
+				factorDim.add(dimension);
+				factorName =annotation +"_"+temp.factorName;
+				//System.out.println("hasAnnotation: " + factorName);
+				
+			} else if(property.equals("hasValue")) {
+				int prefix=beginning.indexOf("gov:");
+				String term = beginning.substring(prefix+4, prefix+14);
+				//System.out.println(term);
+				String queryString01 = prefixes + NL 
+						+ "SELECT ?value \n"
+						+ "WHERE {"+beginning+" mfi:hasValue" + node + " mfi:hasValue ?value }";
+				Query query01 = QueryFactory.create(queryString01, Syntax.syntaxSPARQL);
+				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel);
+				ResultSet values = qexec01.execSelect();
+				for (; values.hasNext() ; ) {
+					QuerySolution rb01 = values.nextSolution();
+					LiteralImpl y = (LiteralImpl) rb01.getLiteral("value");
+					factorName = y.toString();
+				}
+				qexec01.close();
+				//System.out.println(property + ": " + factorName);
+				finalDimension = factorDimension(term, null, systemOfUnits);
+				//System.out.println("valueDim: "+finalDimension);
+				
+			} else {
+				//System.out.println(property + " (property not relevant)");
+				
+			}
+		}
+		qexec.close();
+		
+		if(factorDim.size()>0) {
+			finalDimension = factorDim.get(0);
+			for(int i=1; i<factorDim.size(); i++) {
+				finalDimension = factorDim.get(i).multiply(finalDimension);
+			}
+			//System.out.println("final: "+ finalDimension);
+		} 
+		
+		
+		Stringmension answer = new Stringmension(factorName, finalDimension);
+		
+		return answer;
+	}
+	
+	//returns the dimension of a named variable by finding its sub- and super-scripts and passing the 
+	//full name to findDimension();
+	public Dimension factorDimension(String term, String factor, String systemOfUnits) {
+		Dimension dimension = new SIDimension();
+		
+		String nameStatement; //customized query w name of each factor
+		String checkSubscript; //query to check for presence of subscript to factor
+		String checkSuperscript; //query to check for presence of superscript to factor	
+
+		nameStatement = "gov:"+term + " mfi:hasFactor _:C . \n _:C mfi:hasVariable _:a . \n _:a mfi:hasName \""
+						+ factor +"\"^^xsd:string . \n";
+
+		checkSubscript =  nameStatement + "_:a mfi:hasSubscript _:x "; 
+		Boolean subscriptPresent = ask(checkSubscript);
+
+		checkSuperscript =  nameStatement + " _:a mfi:hasSuperscript _:y ";
+		Boolean superscriptPresent = ask(checkSuperscript);
+		
+		//System.out.println(subscriptPresent+", "+superscriptPresent);
+		
+		String variableQuery = " mfi:hasVariable _:n . \n"
+				+ "_:n mfi:hasName ";		
+		String valueQuery = " mfi:hasValue _:o .\n"
+				+ "_:o mfi:hasValue ";
+		String subQuery = "_:a mfi:hasSubscript _:e . \n"
+				+ "_:e mfi:hasFactor _:f . \n"
+				+ "_:f ";
+		String supQuery = "_:a mfi:hasSuperscript _:h . \n"
+				+ "_:h mfi:hasFactor _:i . \n"
+				+ "_:i ";
+
+
+		if(subscriptPresent && superscriptPresent) { 
+			String queryString;
+			if(ask(nameStatement + subQuery + valueQuery + "?value") && ask(nameStatement + supQuery + valueQuery + "?value")){
+				queryString =   prefixes + NL +
+						"SELECT ?superscript ?subscript" + NL +
+						"WHERE { \n "+ nameStatement + subQuery + valueQuery + " ?subscript "
+						+ supQuery + valueQuery+" ?superscript }"
+						+ "GROUP BY ?superscript ?subscript";
+			} else if (!ask(nameStatement + subQuery + valueQuery + "?value") && ask(nameStatement + supQuery + valueQuery + "?value")){
+				queryString =   prefixes + NL +
+						"SELECT ?superscript ?subscript" + NL +
+						"WHERE { \n "+ nameStatement + subQuery + variableQuery + "?subscript "
+								+ supQuery + valueQuery+" ?superscript }"
+						+ "GROUP BY ?superscript ?subscript";
+			} else if (ask(nameStatement + subQuery + valueQuery + "?value") && !ask(nameStatement + supQuery + valueQuery + "?value")){
+				throw new UndeterminedDimensionException();
+			} else {
+				throw new UndeterminedDimensionException();
+			}
+
+			Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
+			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+			ResultSet rs = qexec.execSelect();
+
+			for ( ; rs.hasNext() ; ){
+				QuerySolution rb = rs.nextSolution() ;
+				LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
+				LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
+				//System.out.println("factor: (" + factor + "_" + z.getString() + ")^" + y.getString());
+				dimension = findDimension(factor + "_" + z.getString(), systemOfUnits);
+				if (y.getInt()==y.getDouble()) {
+					for (int k = 1; k < y.getInt(); k++) {
+						dimension = dimension.multiply(dimension);
+					} 
+				} else {
+					//decimal exponent - what does this mean for dimensions?
+					throw new UndeterminedDimensionException();
+				}
+			}
+			qexec.close() ;
+
+
+		} else if(!subscriptPresent && superscriptPresent) {
+			String queryString;
+			if (ask(nameStatement + supQuery + valueQuery + "?value")){
+				queryString =   prefixes + NL +
+						"SELECT ?superscript " + NL +
+						"WHERE { \n "+ nameStatement + supQuery + valueQuery+" ?superscript }";
+			} else {
+				throw new UndeterminedDimensionException();
+			}
+
+			Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
+			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+			ResultSet rs = qexec.execSelect();
+
+			for ( ; rs.hasNext() ; ){
+				QuerySolution rb = rs.nextSolution() ;
+				LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
+				//System.out.println("factor: " + factor +"^" + y.getString());
+				dimension = findDimension(factor, systemOfUnits);
+				if (y.getInt()==y.getDouble()) {
+					for (int k = 1; k < y.getInt(); k++) {
+						dimension = dimension.multiply(dimension);
+					} 
+				} else {
+					//decimal exponent - what does this mean for dimensions?
+					throw new UndeterminedDimensionException();
+				}
+			}
+			qexec.close() ;
+
+		}else if(subscriptPresent && !superscriptPresent) {				
+			String queryString;
+			if(ask(nameStatement + subQuery + valueQuery + "?value")){
+				queryString =   prefixes + NL +
+						"SELECT ?subscript" + NL +
+						"WHERE { \n "+ nameStatement + subQuery + valueQuery + " ?subscript }";
+			} else {
+				queryString =   prefixes + NL +
+						"SELECT ?subscript" + NL +
+						"WHERE { \n "+ nameStatement + subQuery + variableQuery +" ?subscript }";
+			} 
+			Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
+			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
+			ResultSet rs = qexec.execSelect();
+
+			for ( ; rs.hasNext() ; ){
+				QuerySolution rb = rs.nextSolution() ;
+				LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript"); 
+				//System.out.println("factor: " + factor + "_" + z.getString());
+				dimension = findDimension(factor+ "_" + z.getString(), systemOfUnits);
+			}
+			qexec.close() ;
+
+		} else {
+			//System.out.println("factor: "+factor);
+			dimension = findDimension(factor, systemOfUnits);
+		}
+		//System.out.println("factordimension: " + dimension);
+		
+		return dimension;
+
+	}
+
+	//queries the units and dimensions QUDT ontologies to return the dimension of a variable
+	public Dimension findDimension(String factor, String systemOfUnits) {
+		Dimension dimension;
+		String unit = null;;
+		
+		String queryString04 = prefixes + NL  + "SELECT ?dimension" + NL  + 
+				"WHERE {:" + factor + " :hasUnits" + " ?dimension}";
+		Query query04 = QueryFactory.create(queryString04);
+		QueryExecution qexec04 = QueryExecutionFactory.create(query04, ontologyModel);
+		ResultSet factorDimension = qexec04.execSelect();
+		for (; factorDimension.hasNext() ;) {
+			QuerySolution rb3 = factorDimension.nextSolution();
+			Resource x3 = (Resource) rb3.getResource("dimension");
+			unit = x3.getLocalName();
+		}
+		//System.out.println("factor in findDimension: " +factor);
+		//System.out.println("unit: " + unit);
+		qexec04.close();
+		
+		switch (systemOfUnits) {
+		case "US" :
+			dimension = new USDimension(unit);
+			break;
+		case "Planck":
+			dimension = new PlanckDimension(unit);
+			break;
+		case "CGS" :
+			dimension=new CGSDimension(unit);
+			break;
+		default :
+			dimension = new SIDimension(unit);	
+		}
+		return dimension;
+	}
+	
+
 	//checks proportionality of variables
 	public Boolean checkProportionality(String equationURI){
 		Boolean consistency=true;
@@ -225,646 +613,6 @@ public class Identifier {
 	
 		return consistency;
 	}
-
-	public Boolean ask(String askQuery) {
-		String queryString = prefixes + NL + "ASK { " + askQuery + "}";
-		Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
-		QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-		Boolean answer = qexec.execAsk();
-		qexec.close();
-
-		return answer;
-	}
-	
-	public Stringmension totalDimension(String beginning, int index) {		 
-		String factorName=null;
-		String systemOfUnits = "SI"; 
-		Dimension dimension;
-		Stringmension temp;
-		Dimension finalDimension = new SIDimension();
-		String property=null;
-		ArrayList<Dimension> factorDim = new ArrayList<Dimension>();
-		ArrayList<Dimension> termDim = new ArrayList<Dimension>();
-		String[] alphabet = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","z","y"};
-		String node = " _:"+alphabet[index]+" . \n _:"+alphabet[index]+" ";
-		String queryString = prefixes + NL 
-				+ "SELECT ?predicate ?node \n"
-				+ "WHERE {"+beginning+" ?predicate ?node \n"
-						+ " FILTER (?predicate != rdf:type ) \n"
-						+ "FILTER (?predicate != mfi:hasFactorOrder ) \n }";
-		System.out.println();
-		//System.out.println(queryString);
-		Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
-		//query.serialize(new IndentedWriter(System.out,true)) ;
-		
-		QueryExecution qexec = QueryExecutionFactory.create(query, myModel);
-		ResultSet names = qexec.execSelect();
-		for (; names.hasNext() ; ) {
-			QuerySolution rb = names.nextSolution();
-			Resource x = (Resource) rb.getResource("predicate");
-			property = x.getLocalName();
-			
-			if(property.equals("hasExpression")) {
-				System.out.println(property);
-				index++;
-				temp=totalDimension(beginning + "mfi:hasExpression "+node, index );
-				factorName = temp.factorName; 
-				finalDimension=temp.dimension;
-				
-			} else if(property.equals("hasTerm")) {
-				index++;
-				Resource y = (Resource) rb.getResource("node");
-				String termName = y.getLocalName();
-				System.out.println("termName: "+termName);
-				temp=totalDimension("gov:" + termName, index);
-				factorName = temp.factorName;
-				dimension=temp.dimension;
-				System.out.println(property + ": " + termName + " dimension: " + dimension);
-				termDim.add(dimension);
-				
-			} else if(property.equals("hasFactor")) {
-				System.out.println(property);
-				index++;
-				temp=totalDimension(beginning + " mfi:hasFactor "+node, index);
-				factorName = temp.factorName;
-				dimension = temp.dimension;
-				System.out.println("factorDim: " + dimension);
-				if(dimension.getDimensionUnits()!= null){
-					factorDim.add(dimension);
-				}
-				
-			} else if(property.equals("hasVariable")) {
-				System.out.println(property);
-				index++;
-				temp=totalDimension(beginning + " mfi:hasVariable "+node, index);
-				factorName = temp.factorName;
-				finalDimension = temp.dimension;
-				//always followed by mfi:hasName "__"^^xsd:string 
-				
-			} else if(property.equals("hasFraction")) {
-				index++;
-				
-				Stringmension num = totalDimension(beginning + " mfi:hasFraction ?a . \n ?a mfi:hasNumerator " 
-				+ node, index);
-				Stringmension den = totalDimension(beginning + " mfi:hasFraction ?a . \n ?a mfi:hasDenominator " 
-				+ node, index);
-				
-				Dimension numerator=num.dimension;	
-				Dimension denominator=den.dimension;
-				finalDimension = numerator.divide(denominator);	
-				factorName = num.factorName + "/"+ den.factorName;
-				
-			} else if(property.equals("hasAnnotationExp")) {
-				System.out.println(property);
-				index++;
-				temp=totalDimension(beginning + "mfi:hasAnnotationExp "+node, index);
-				factorName = temp.factorName;
-				finalDimension = temp.dimension;
-				//always followed by mfi:hasAnnotation "__"^^xsd:string and
-				//mfi:hasExpression [mfi:hasTerm ....
-				
-			} else if(property.equals("hasName")) {
-				int prefix=beginning.indexOf("gov:");
-				String term = beginning.substring(prefix+4, prefix+14);
-				System.out.println(term);
-				index++;
-				LiteralImpl y = (LiteralImpl) rb.getLiteral("node");
-				factorName = y.getString();
-				System.out.println(property + ": " + factorName);
-				finalDimension = factorDimension(term, factorName, systemOfUnits);
-				
-			} else if(property.equals("hasAnnotation")) {
-				int prefix=beginning.indexOf("gov:");
-				String term = beginning.substring(prefix+4, prefix+14);
-				System.out.println(term);
-				index++;
-				LiteralImpl y = (LiteralImpl) rb.getLiteral("node");
-				String annotation = y.getString();
-				factorName =totalDimension(beginning + "mfi:hasExpression "+node, index ).factorName+"_"+annotation;
-				System.out.println(property + ": " + factorName);
-				finalDimension = factorDimension(term, factorName, systemOfUnits);
-				
-			} else if(property.equals("hasValue")) {
-				int prefix=beginning.indexOf("gov:");
-				String term = beginning.substring(prefix+4, prefix+14);
-				System.out.println(term);
-				String queryString01 = prefixes + NL 
-						+ "SELECT ?value \n"
-						+ "WHERE {"+beginning+" mfi:hasValue" + node + " mfi:hasValue ?value }";
-				Query query01 = QueryFactory.create(queryString01, Syntax.syntaxSPARQL);
-				QueryExecution qexec01 = QueryExecutionFactory.create(query01, myModel);
-				ResultSet values = qexec01.execSelect();
-				for (; values.hasNext() ; ) {
-					QuerySolution rb01 = values.nextSolution();
-					LiteralImpl y = (LiteralImpl) rb01.getLiteral("value");
-					factorName = y.toString();
-				}
-				System.out.println(property + ": " + factorName);
-				finalDimension = factorDimension(term, null, systemOfUnits);
-				
-			} else {
-				//System.out.println(property + " (property not relevant)");
-				
-			}
-		}
-		qexec.close();
-		
-		if(factorDim.size()>0) {
-			finalDimension = factorDim.get(0);
-			for(int i=1; i<factorDim.size(); i++) {
-				finalDimension = factorDim.get(i).multiply(finalDimension);
-			}
-		} 
-		String termList=null;
-		if(termDim.size()>0&&property.equals("hasTerm")) {
-			finalDimension = termDim.get(0);
-			for(int i=1; i<termDim.size(); i++) {
-				if(termDim.get(i).equals(termDim.get(i-1))) {
-					termList = termDim.get(i).getDimensionUnits() + " equals " 
-								+ termDim.get(i-1).getDimensionUnits();
-					continue;
-				} else {
-					System.out.println("Inconsistent term dimensions");
-					throw new UndeterminedDimensionException();
-				}
-			}
-			System.out.println("termDim: " + termDim.size() + " | "+ termList);
-		}
-		
-		Stringmension answer = new Stringmension(factorName, finalDimension);
-		
-		return answer;
-	}
-	
-	public Dimension findDimension(String factor, String systemOfUnits) {
-		Dimension dimension;
-		String unit = null;;
-		
-		String queryString04 = prefixes + NL  + "SELECT ?dimension" + NL  + 
-				"WHERE {:" + factor + " :hasUnits" + " ?dimension}";
-		Query query04 = QueryFactory.create(queryString04);
-		QueryExecution qexec04 = QueryExecutionFactory.create(query04, ontologyModel);
-		ResultSet factorDimension = qexec04.execSelect();
-		for (; factorDimension.hasNext() ;) {
-			QuerySolution rb3 = factorDimension.nextSolution();
-			Resource x3 = (Resource) rb3.getResource("dimension");
-			unit = x3.getLocalName();
-		}
-		//System.out.println("factor in findDimension: " +factor);
-		//System.out.println("unit: " + unit);
-		qexec04.close();
-		
-		switch (systemOfUnits) {
-		case "US" :
-			dimension = new USDimension(unit);
-			break;
-		case "Planck":
-			dimension = new PlanckDimension(unit);
-			break;
-		case "CGS" :
-			dimension=new CGSDimension(unit);
-			break;
-		default :
-			dimension = new SIDimension(unit);	
-		}
-		
-		return dimension;
-	}
-
-	public Dimension factorDimension(String term, String factor, String systemOfUnits) {
-		Dimension dimension = new SIDimension();
-		
-		String nameStatement; //customized query w name of each factor
-		String checkSubscript; //query to check for presence of subscript to factor
-		String checkSuperscript; //query to check for presence of superscript to factor	
-
-		nameStatement = "gov:"+term + " mfi:hasFactor _:C . \n _:C mfi:hasVariable _:a . \n _:a mfi:hasName \""
-						+ factor +"\"^^xsd:string . \n";
-
-		checkSubscript =  nameStatement + "_:a mfi:hasSubscript _:x "; 
-		Boolean subscriptPresent = ask(checkSubscript);
-
-		checkSuperscript =  nameStatement + " _:a mfi:hasSuperscript _:y ";
-		Boolean superscriptPresent = ask(checkSuperscript);
-		
-		String variableQuery = " mfi:hasVariable _:n . \n"
-				+ "_:n mfi:hasName ";		
-		String valueQuery = " mfi:hasValue _:o .\n"
-				+ "_:o mfi:hasValue ";
-		String subQuery = "_:a mfi:hasSubscript _:e . \n"
-				+ "_:e mfi:hasFactor _:f . \n"
-				+ "_:f ";
-		String supQuery = "_:a mfi:hasSuperscript _:h . \n"
-				+ "_:h mfi:hasFactor _:i . \n"
-				+ "_:i ";
-
-
-		if(subscriptPresent && superscriptPresent) { 
-			String queryString;
-			if(ask(nameStatement + subQuery + valueQuery + "?value") && ask(nameStatement + supQuery + valueQuery + "?value")){
-				queryString =   prefixes + NL +
-						"SELECT ?superscript ?subscript" + NL +
-						"WHERE { \n "+ nameStatement + subQuery + valueQuery + " ?subscript "
-						+ supQuery + valueQuery+" ?superscript }"
-						+ "GROUP BY ?superscript ?subscript";
-			} else if (!ask(nameStatement + subQuery + valueQuery + "?value") && ask(nameStatement + supQuery + valueQuery + "?value")){
-				queryString =   prefixes + NL +
-						"SELECT ?superscript ?subscript" + NL +
-						"WHERE { \n "+ nameStatement + subQuery + variableQuery + "?subscript "
-								+ supQuery + valueQuery+" ?superscript }"
-						+ "GROUP BY ?superscript ?subscript";
-			} else if (ask(nameStatement + subQuery + valueQuery + "?value") && !ask(nameStatement + supQuery + valueQuery + "?value")){
-				throw new UndeterminedDimensionException();
-			} else {
-				throw new UndeterminedDimensionException();
-			}
-
-			Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
-			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-			ResultSet rs = qexec.execSelect();
-
-			for ( ; rs.hasNext() ; ){
-				QuerySolution rb = rs.nextSolution() ;
-				LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
-				LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
-				System.out.println("factor: (" + factor + "_" + z.getString() + ")^" + y.getString());
-				dimension = findDimension(factor + "_" + z.getString(), systemOfUnits);
-				if (y.getInt()==y.getDouble()) {
-					for (int k = 1; k < y.getInt(); k++) {
-						dimension = dimension.multiply(dimension);
-					} 
-				} else {
-					//decimal exponent - what does this mean for dimensions?
-					throw new UndeterminedDimensionException();
-				}
-			}
-			qexec.close() ;
-
-
-		} else if(!subscriptPresent && superscriptPresent) {
-			String queryString;
-			if (ask(nameStatement + supQuery + valueQuery + "?value")){
-				queryString =   prefixes + NL +
-						"SELECT ?superscript " + NL +
-						"WHERE { \n "+ nameStatement + supQuery + valueQuery+" ?superscript }";
-			} else {
-				throw new UndeterminedDimensionException();
-			}
-
-			Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
-			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-			ResultSet rs = qexec.execSelect();
-
-			for ( ; rs.hasNext() ; ){
-				QuerySolution rb = rs.nextSolution() ;
-				LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
-				System.out.println("factor: " + factor +"^" + y.getString());
-				dimension = findDimension(factor, systemOfUnits);
-				if (y.getInt()==y.getDouble()) {
-					for (int k = 1; k < y.getInt(); k++) {
-						dimension = dimension.multiply(dimension);
-					} 
-				} else {
-					//decimal exponent - what does this mean for dimensions?
-					throw new UndeterminedDimensionException();
-				}
-			}
-			qexec.close() ;
-
-		}else if(subscriptPresent && !superscriptPresent) {				
-			String queryString;
-			if(ask(nameStatement + subQuery + valueQuery + "?value")){
-				queryString =   prefixes + NL +
-						"SELECT ?subscript" + NL +
-						"WHERE { \n "+ nameStatement + subQuery + valueQuery + " ?subscript }";
-			} else {
-				queryString =   prefixes + NL +
-						"SELECT ?subscript" + NL +
-						"WHERE { \n "+ nameStatement + subQuery + variableQuery +" ?subscript }";
-			} 
-			Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
-			QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-			ResultSet rs = qexec.execSelect();
-
-			for ( ; rs.hasNext() ; ){
-				QuerySolution rb = rs.nextSolution() ;
-				LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript"); 
-				System.out.println("factor: " + factor + "_" + z.getString());
-				dimension = findDimension(factor+ "_" + z.getString(), systemOfUnits);
-			}
-			qexec.close() ;
-
-		} else {
-			dimension = findDimension(factor, systemOfUnits);
-		}
-		return dimension;
-
-	}
 }	
-	
-	
-	/*
-	//DELETE? (replaced by factorDimension?)
-	public Dimension termDimension(ArrayList<String> factors, String systemOfUnits) {
-		
-		Dimension finalDimension;
-		Dimension dimension; //temporary variable
-		ArrayList<Dimension> dimensionsToMultiply = new ArrayList<Dimension>(); //list of dimensions that go into finalDimension
-	
-		String variableQuery = " mfi:hasVariable _:n ."
-				+ "_:n mfi:hasName ?name .";		
-		String valueQuery = " mfi:hasValue _:o .\n"
-				+ "_:o mfi:hasValue ?value .";
-		String subQuery = "_:n mfi:hasSubscript _:e . \n"
-				+ "_:e mfi:hasFactor _:f . \n"
-				+ "_:f ";
-		String supQuery = "_:n mfi:hasSuperscript _:h . \n"
-				+ "_:h mfi:hasFactor _:i . \n"
-				+ "_:i ";
-
-		String nameStatement; //customized query w name of each factor
-		String checkSubscript; //query to check for presence of subscript to factor
-		String checkSuperscript; //query to check for presence of superscript to factor	
-		
-		for (int index=0;index<factors.size(); index++) {
-			
-			if(isExpression) {
-				nameStatement = "mfi:" +equationURI+" mfi:hasRelation _:g . \n "
-						+ "_:g mfi:" + equationSide + " _:x. \n" 
-						+"_:x mfi:hasExpression _:d .\n "
-						+ " _:d mfi:hasTerm _:a . \n" + 
-						" _:a mfi:hasFactor _:b . \n " + 
-						" _:b mfi:hasVariable _:c . \n "
-						+ "_:c mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
-			} else {
-				nameStatement = "mfi:" +equationURI+" mfi:hasRelation _:g . \n "
-						+ "_:g mfi:" + equationSide + " _:d .\n "
-						+ " _:d mfi:hasTerm _:a . \n" + 
-						" _:a mfi:hasFactor _:b . \n " + 
-						" _:b mfi:hasVariable _:c . \n "
-						+ "_:c mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
-			}
-			
-			
-			nameStatement = "_:n mfi:hasName \""+ factors.get(index) +"\"^^xsd:string . \n";
-			
-			checkSubscript =  prefixes + NL + "ASK {"+nameStatement + "_:n mfi:hasSubscript _:e . \n}"; 
-			Boolean subscriptPresent = ask(checkSubscript);
-
-			checkSuperscript =  prefixes + NL + "ASK {" + nameStatement + " _:n mfi:hasSuperscript _:h . \n}";
-			Boolean superscriptPresent = ask(checkSuperscript);
-
-			if(subscriptPresent && superscriptPresent) { 
-				String queryString;
-				if(ask(nameStatement + subQuery + valueQuery) && ask(nameStatement + supQuery + valueQuery)){
-					queryString =   prefixes + NL +
-							"SELECT ?superscript ?subscript" + NL +
-							"WHERE { \n "+ nameStatement + subQuery + valueQuery + supQuery + valueQuery+" }"
-							+ "GROUP BY ?superscript ?subscript";
-				} else if (!ask(nameStatement + subQuery + valueQuery) && ask(nameStatement + supQuery + valueQuery)){
-					queryString =   prefixes + NL +
-							"SELECT ?superscript ?subscript" + NL +
-							"WHERE { \n "+ nameStatement + subQuery + variableQuery + supQuery + valueQuery+" }"
-							+ "GROUP BY ?superscript ?subscript";
-				} else if (ask(nameStatement + subQuery + valueQuery) && !ask(nameStatement + supQuery + valueQuery)){
-					throw new UndeterminedDimensionException();
-				} else {
-					throw new UndeterminedDimensionException();
-				}
-
-				Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ; 
-				QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-				ResultSet rs = qexec.execSelect();
-
-				for ( ; rs.hasNext() ; ){
-					QuerySolution rb = rs.nextSolution() ;
-					LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
-					LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
-					System.out.println("(" + factors.get(index) + "_" + z.getString() + ")^" + y.getString());
-					dimension = findDimension(factors.get(index) + "_" + z.getString(), systemOfUnits);
-					if (y.getInt()==y.getDouble()) {
-						for (int k = 1; k < y.getInt(); k++) {
-							dimension = dimension.multiply(dimension);
-						} 
-					} else {
-						//decimal exponent - what does this mean for dimensions?
-						throw new UndeterminedDimensionException();
-					}
-					dimensionsToMultiply.add(dimension);
-				}
-				qexec.close() ;
-
-
-			} else if(!subscriptPresent && superscriptPresent) {
-				String queryString;
-				if (ask(nameStatement + supQuery + valueQuery)){
-					queryString =   prefixes + NL +
-							"SELECT ?superscript " + NL +
-							"WHERE { \n "+ nameStatement + supQuery + valueQuery+" }";
-				} else {
-					throw new UndeterminedDimensionException();
-				}
-				
-				Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
-				QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-				ResultSet rs = qexec.execSelect();
-
-				for ( ; rs.hasNext() ; ){
-					QuerySolution rb = rs.nextSolution() ;
-					LiteralImpl y = (LiteralImpl) rb.getLiteral("superscript");
-					System.out.println(factors.get(index) +"^" + y.getString());
-					dimension = findDimension(factors.get(index), systemOfUnits);
-					if (y.getInt()==y.getDouble()) {
-						for (int k = 1; k < y.getInt(); k++) {
-							dimension = dimension.multiply(dimension);
-						} 
-					} else {
-						//decimal exponent - what does this mean for dimensions?
-						throw new UndeterminedDimensionException();
-					}
-					dimensionsToMultiply.add(dimension);
-				}
-				qexec.close() ;
-
-			}else if(subscriptPresent && !superscriptPresent) {				
-				String queryString;
-				if(ask(nameStatement + subQuery + valueQuery)){
-					queryString =   prefixes + NL +
-							"SELECT ?subscript" + NL +
-							"WHERE { \n "+ nameStatement + subQuery + valueQuery + " }";
-				} else {
-					queryString =   prefixes + NL +
-							"SELECT ?subscript" + NL +
-							"WHERE { \n "+ nameStatement + subQuery + variableQuery +" }";
-				} 
-				Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL) ;
-				QueryExecution qexec = QueryExecutionFactory.create(query, myModel) ;
-				ResultSet rs = qexec.execSelect();
-
-				for ( ; rs.hasNext() ; ){
-					QuerySolution rb = rs.nextSolution() ;
-					LiteralImpl z = (LiteralImpl) rb.getLiteral("subscript");
-					dimension = findDimension(factors.get(index) + "_" + z.getString(), systemOfUnits);
-					dimensionsToMultiply.add(dimension);
-				}
-				qexec.close() ;
-				
-			} else {
-				dimension = findDimension(factors.get(index), systemOfUnits);
-				dimensionsToMultiply.add(dimension);
-			}
-		}	
-		
-		if(dimensionsToMultiply.size()>0) {
-			finalDimension = dimensionsToMultiply.get(0);
-			for(int i=1; i<dimensionsToMultiply.size(); i++) {
-				finalDimension = dimensionsToMultiply.get(i).multiply(finalDimension);
-			}
-		} else {
-			finalDimension = new SIDimension();
-		}
-		
-		return finalDimension;
-	}
-
-	//DELETE?
-	//find the dimension vector of one side of an equation given starting String and system of units
-	public Dimension totalDimension(String start, String systemOfUnits) { 
-		
-
-		Dimension finalDimension;	
-		Dimension termDimension; //each time the do-while loop iterates the termDimension is re-written and the new value added to the terms ArrayList
-
-		switch (systemOfUnits) {
-		case "US" :
-			finalDimension = new USDimension();
-			termDimension = new USDimension();
-			break;
-		case "Planck":
-			finalDimension = new PlanckDimension();
-			termDimension = new PlanckDimension();
-			break;
-		case "CGS" :
-			finalDimension=new CGSDimension();
-			termDimension=new CGSDimension();
-			break;
-		default :
-			finalDimension = new SIDimension();	
-			termDimension = new SIDimension();	
-		}
-
-
-		String variableQuery = "mfi:hasFactor _:d . \n "
-				+ "_:d mfi:hasVariable _:n ."
-				+ "_:n mfi:hasName ?name .";
-		String fractionQuery = " mfi:hasFactor _:d . \n "
-				+ "_:d mfi:hasFraction _:k . \n";			
-		String valueQuery = " mfi:hasValue _:o .\n"
-				+ "_:o mfi:hasValue ?value .";
-
-		String denomQuery = " mfi:hasFraction _:k . \n"
-				+ "_:k mfi:hasDenominator _:l . \n"
-				+ "_:l ";
-		String numQuery = " mfi:hasFraction _:k . \n"
-				+ "_:k mfi:hasNumerator _:m . \n"
-				+ "_:m ";
-
-		//String nameStatement; //customized query w name of each factor
-		//String checkSubscript; //query to check for presence of subscript to factor
-		//String checkSuperscript; //query to check for presence of superscript to factor	
-
-		ArrayList<Dimension> terms = new ArrayList<Dimension>(); //list of terms in an expression
-
-		String nameQuery;
-		Boolean hasPlus=false;
-		Boolean hasMinus=false;
-
-		//expression or term?
-		String expressionQuery = start + "mfi:hasExpression";
-		Boolean isExpression = ask(expressionQuery);
-
-		if(isExpression) {
-			nameQuery = start
-					+"mfi:hasExpression _:x .\n "
-					+ " _:x mfi:hasTerm _:c . \n" + 
-					" _:c ";
-
-			String plusOpQuery = start + "  mfi:plusOp _:c . ";
-			String minusOpQuery = start + "  mfi:minusOp _:c . ";
-			hasPlus=ask(plusOpQuery);
-			hasMinus=ask(minusOpQuery);
-
-		} else {
-			nameQuery = start
-					+ " mfi:hasTerm _:c . \n" + 
-					" _:c mfi:hasFactor _:d . \n"
-					+ "_:d ";
-		}	
-
-		//VARIABLE	
-		if (ask(prefixes + NL + "ASK { " + nameQuery + variableQuery + "}")){
-			ArrayList<String> factors = new ArrayList<String>(); //list of factors of each side of the equation	
-
-			//query to create list of names of multiplied factors in equation
-			String queryString =   prefixes + NL +
-					"SELECT ?name " + NL +
-					"WHERE { \n " + nameQuery + variableQuery + "\n }";
-			Query query = QueryFactory.create(queryString, Syntax.syntaxSPARQL);
-			QueryExecution qexec = QueryExecutionFactory.create(query, myModel);
-			ResultSet names = qexec.execSelect();
-			for (; names.hasNext() ; ) {
-				QuerySolution rb = names.nextSolution();
-				LiteralImpl x = (LiteralImpl) rb.getLiteral("name");
-				factors.add(x.getString());
-			}
-			qexec.close();
-
-			termDimension = termDimension(factors, systemOfUnits);
-
-			//FRACTION
-		}else if (ask(prefixes + NL + "ASK {" + nameQuery + fractionQuery + "}")){
-			String numStart = nameQuery + numQuery;
-			String denomStart = nameQuery + denomQuery;
-
-			Dimension numDimension = totalDimension(numStart, systemOfUnits);
-			Dimension denomDimension = totalDimension(denomStart, systemOfUnits);
-
-			//divide dimensions to get termDimension 
-			termDimension = numDimension.divide(denomDimension);				
-
-			//VALUE	
-		} else if (ask(nameQuery + valueQuery)){
-			System.out.println("term is a constant");
-			termDimension = new SIDimension("Unitless");
-
-			//NO MATCH- BAD
-		} else {
-			System.out.println("not good, not good");
-		}
-
-		terms.add(termDimension);
-
-		if (hasPlus) {
-			String otherTermQuery = start + " mfi:plusOp _:c .\n _:c ";
-			terms.add(totalDimension(otherTermQuery, systemOfUnits));
-		} else if (hasMinus) {
-			String otherTermQuery = start + " mfi:minusOp _:c .\n _:c ";
-			terms.add(totalDimension(otherTermQuery, systemOfUnits));
-		}
-
-		if(terms.size()>0) {
-			finalDimension = terms.get(0);
-			for(int i=1; i<terms.size(); i++) {
-				if(terms.get(i).equals(terms.get(i-1))) {
-					continue;
-				} else {
-					throw new UndeterminedDimensionException();
-				}
-			}
-		} 
-
-		return finalDimension;	
-	}
-	*/
 
 

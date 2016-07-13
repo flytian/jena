@@ -1023,7 +1023,7 @@ _:b1    mfi:hasVariable  [ a                   mfi:Variable ;
                           ] ;
         mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
 
-mfi:realURI0009  a             mfi:MathContent ;
+mfi:realURI009  a             mfi:MathContent ;
         mfi:hasExpression  [ a            mfi:Expression ;
                              mfi:hasTerm  <http://gov.nist.modelmeth/term134636>
                            ] ;

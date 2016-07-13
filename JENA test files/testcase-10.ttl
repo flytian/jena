@@ -1,0 +1,68 @@
+### realURI 0010
+
+@prefix mfi:   <http://modelmeth.nist.gov/mfi/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://gov.nist.modelmeth/term134644>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                     mfi:Factor ;
+                            mfi:hasAnnotationExp  [ a                  mfi:AnnotatedExpression ;
+                                                    mfi:hasAnnotation  "hat"^^xsd:string ;
+                                                    mfi:hasExpression  [ a            mfi:Expression ;
+                                                                         mfi:hasTerm  <http://gov.nist.modelmeth/term134648>
+                                                                       ]
+                                                  ] ;
+                            mfi:hasFactorOrder    "1"^^xsd:nonNegativeInteger
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+mfi:realURI0010  a             mfi:MathContent ;
+        mfi:hasExpression  [ a                  mfi:Expression ;
+                             mfi:hasExpression  [ a            mfi:Expression ;
+                                                  mfi:hasTerm  <http://gov.nist.modelmeth/term134652>
+                                                ] ;
+                             mfi:hasTerm        <http://gov.nist.modelmeth/term134644> ;
+                             mfi:minusOp        <http://gov.nist.modelmeth/term134644>
+                           ] ;
+        mfi:hasLaTeXText   "\\hat{W} - W_i \\ge 0"^^xsd:string .
+
+<http://gov.nist.modelmeth/term134652>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "3"^^xsd:nonNegativeInteger ;
+                            mfi:hasValue        [ a             mfi:LiteralNumber ;
+                                                  mfi:hasValue  "0"^^xsd:decimal
+                                                ]
+                          ] ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "2"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "ge"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a                 mfi:Variable ;
+                                                  mfi:hasName       "W"^^xsd:string ;
+                                                  mfi:hasSubscript  [ a                  mfi:Subscript ;
+                                                                      mfi:hasExpression  _:b0 ;
+                                                                      mfi:hasFactor      _:b0
+                                                                    ]
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "2"^^xsd:nonNegativeInteger .
+
+_:b0    mfi:hasVariable  [ a            mfi:Variable ;
+                           mfi:hasName  "i"^^xsd:string
+                         ] .
+
+<http://gov.nist.modelmeth/term134648>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "W"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .

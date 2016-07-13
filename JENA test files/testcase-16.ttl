@@ -1,0 +1,89 @@
+### realURI 0016
+
+@prefix mfi:   <http://modelmeth.nist.gov/mfi/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://gov.nist.modelmeth/term134892>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "P"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+<http://gov.nist.modelmeth/term134900>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasExpression   [ a                  mfi:Expression ;
+                                                  mfi:hasExpression  [ a                  mfi:Expression ;
+                                                                       mfi:hasExpression  [ a            mfi:Expression ;
+                                                                                            mfi:hasTerm  <http://gov.nist.modelmeth/term134911>
+                                                                                          ] ;
+                                                                       mfi:hasTerm        <http://gov.nist.modelmeth/term134907> ;
+                                                                       mfi:plusOp         <http://gov.nist.modelmeth/term134907>
+                                                                     ] ;
+                                                  mfi:hasTerm        <http://gov.nist.modelmeth/term134903> ;
+                                                  mfi:plusOp         <http://gov.nist.modelmeth/term134903>
+                                                ] ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger
+                          ] ;
+        mfi:hasTermOrder  "2"^^xsd:nonNegativeInteger .
+
+<http://gov.nist.modelmeth/term134896>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "E"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+<http://gov.nist.modelmeth/term134903>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "DC"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "1"^^xsd:nonNegativeInteger .
+
+mfi:realURI0016  a            mfi:MathContent ;
+        mfi:hasLaTeXText  "P = E - (DC + GC + QC)"^^xsd:string ;
+        mfi:hasRelation   [ a                    mfi:Relation ;
+                            mfi:hasLHS           [ a            mfi:Expression ;
+                                                   mfi:hasTerm  <http://gov.nist.modelmeth/term134892>
+                                                 ] ;
+                            mfi:hasRHS           [ a                  mfi:Expression ;
+                                                   mfi:hasExpression  [ a            mfi:Expression ;
+                                                                        mfi:hasTerm  <http://gov.nist.modelmeth/term134900>
+                                                                      ] ;
+                                                   mfi:hasTerm        <http://gov.nist.modelmeth/term134896> ;
+                                                   mfi:minusOp        <http://gov.nist.modelmeth/term134896>
+                                                 ] ;
+                            mfi:hasRelationalOp  mfi:eq
+                          ] .
+
+<http://gov.nist.modelmeth/term134911>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "QC"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "3"^^xsd:nonNegativeInteger .
+
+<http://gov.nist.modelmeth/term134907>
+        a                 mfi:Term ;
+        mfi:hasFactor     [ a                   mfi:Factor ;
+                            mfi:hasFactorOrder  "1"^^xsd:nonNegativeInteger ;
+                            mfi:hasVariable     [ a            mfi:Variable ;
+                                                  mfi:hasName  "GC"^^xsd:string
+                                                ]
+                          ] ;
+        mfi:hasTermOrder  "2"^^xsd:nonNegativeInteger .

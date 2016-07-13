@@ -59,7 +59,7 @@ public class SIDimension implements Dimension{
 				Resource quantity = (Resource) rb.getResource("quantity"); 
 				quantityString = quantity.getLocalName(); //output of form BlahBlahUnit
 			}
-			queryExec.close();
+			queryExec.close();                                                        
 			quantityKind = quantityString.replaceAll("Unit", "");
 
 			switch (quantityKind)
