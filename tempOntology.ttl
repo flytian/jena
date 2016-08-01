@@ -5,6 +5,70 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
+:realURI001  :hasDimensionalConsistency
+                true .
+
+:realURI001RHS  :hasDimensionVector  "M^0 L^1 T^0 I^0 theta^0 N^0 J^0 U^-1" ;
+        :isConsistentWith    :realURI001LHS .
+
+:realURI001LHS  :hasDimensionVector  "M^0 L^1 T^0 I^0 theta^0 N^0 J^0 U^0" .
+
+:realURI002  :hasDimensionalConsistency
+                true .
+
+:realURI002RHS  :hasDimensionVector  "M^0 L^1 T^0 I^0 theta^0 N^0 J^0 U^0" ;
+        :isConsistentWith    :realURI002LHS .
+		
+:realURI002LHS  :hasDimensionVector  "M^0 L^1 T^0 I^0 theta^0 N^0 J^0 U^0" .
+
+:realURI003  :hasDimensionalConsistency
+                true .
+
+:realURI003RHS  :hasDimensionVector  "M^0 L^0 T^1 I^0 theta^0 N^0 J^0 U^1" ;
+        :isConsistentWith    :realURI003LHS .
+		
+:realURI003LHS  :hasDimensionVector  "M^0 L^0 T^1 I^0 theta^0 N^0 J^0 U^0" .
+
+:realURI005  :inconsistencyCause  :UnequalDimensions .
+
+:realURI007  :hasDimensionalConsistency
+                true .
+
+:realURI007RHS  :hasDimensionVector  "M^0 L^0 T^0 I^0 theta^0 N^0 J^0 U^1" ;
+        :isConsistentWith    :realURI007LHS .
+
+:realURI007LHS  :hasDimensionVector  "M^0 L^0 T^0 I^0 theta^0 N^0 J^0 U^1" .
+
+:realURI0011LHS  :hasDimensionVector  "M^0 L^1 T^0 I^0 theta^0 N^0 J^0 U^0" .
+
+:realURI0011  :hasDimensionalConsistency
+                true .
+
+:realURI0011RHS  :hasDimensionVector  "M^0 L^1 T^0 I^0 theta^0 N^0 J^0 U^1" ;
+        :isConsistentWith    :realURI0011LHS .
+
+:realURI0015  :hasDimensionalConsistency
+                true .
+
+:realURI0015RHS  :hasDimensionVector  "M^0 L^0 T^0 I^0 theta^0 N^0 J^0 U^1" ;
+        :isConsistentWith    :realURI0015LHS .				
+
+:realURI0015LHS  :hasDimensionVector  "M^0 L^0 T^0 I^0 theta^0 N^0 J^0 U^1" .
+
+:realURI0016  :hasDimensionalConsistency
+                true .
+				
+:realURI0016RHS  :hasDimensionVector  "M^0 L^0 T^0 I^0 theta^0 N^0 J^0 U^1" ;
+        :isConsistentWith    :realURI0016LHS .
+
+:realURI0016LHS  :hasDimensionVector  "M^0 L^0 T^0 I^0 theta^0 N^0 J^0 U^1" .
+@prefix :      <http://modelmeth.nist.gov/manufacturing#> .
+@prefix qudt:  <http://qudt.org/schema/qudt#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
 :realURI002RHS  :hasDimensionVector  "M^0 L^1 T^0 I^0 theta^0 N^0 J^0 U^0" ;
         :isConsistentWith    :realURI002LHS .
 

@@ -5,6 +5,11 @@ import java.util.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.riot.RDFDataMgr;
 
+/*
+ * This is the main method of the program. It creates a new file that contains Turtle triples
+ * stating information about the dimensional consistency of the equations contained in the equationModel 
+ * variable. 
+ */
 public class EquationValidator {
 
 	public static final String NL = System.getProperty("line.separator") ;
@@ -20,34 +25,35 @@ public class EquationValidator {
 		 * "Planck" = Planck System
 		 */
 
+		//ontology prefixes
 		String prefixString = "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + NL + 
 				"PREFIX : <http://modelmeth.nist.gov/manufacturing#>" + NL + 
 				"PREFIX mfi:  <http://modelmeth.nist.gov/mfi/>" + NL + 
 				"PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + NL +
 				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + NL + 
-				"PREFIX gov:	<http://gov.nist.modelmeth/> ";		//ontology prefixes
+				"PREFIX gov:	<http://gov.nist.modelmeth/> ";		
 
 		Model manufacturingOntology = RDFDataMgr.loadModel("manufacturing.ttl"); //general manufacturing ontology
 		Model notebookTriples = RDFDataMgr.loadModel("temp-doc-turning-triples.ttl");//ontology containing variable information from the IPython notebook
 		Model equationModel = RDFDataMgr.loadModel("all-equations-working.ttl"); //ontology containing equation information from the IPython notebook
 
-		Model ontologyModel = ModelFactory.createDefaultModel(); //ontology queried over
+		//creating the Model to be queried over
+		Model ontologyModel = ModelFactory.createDefaultModel(); 
 		ontologyModel.add(manufacturingOntology);
 		ontologyModel.add(notebookTriples);
 
-		Model tempModel = ModelFactory.createOntologyModel(); //ontology that triples are added to
-		//alternatively, they could be added to any of the other models
+		//creating new Model that dimensionality triples are added to
+		Model tempModel = ModelFactory.createOntologyModel(); 
 		tempModel.setNsPrefix("", "http://modelmeth.nist.gov/manufacturing#");
 		tempModel.setNsPrefix("qudt", "http://qudt.org/schema/qudt#");
 
-		Identifier equationID = new Identifier(equationModel, ontologyModel, prefixString);
+		//all information needed to determine dimensionality
+		Identifier equationID = new Identifier(equationModel, ontologyModel, prefixString); 	
 		ArrayList<String> nameURI = equationID.findSubject("a", "mfi:MathContent"); //list of all equation URIs in the ontology
-		System.out.println(nameURI.toString());
-		System.out.println();
-		Stringmension one;
-		Stringmension two;
-		Dimension dimLHS; //dimension of the RHS of each equation
-		Dimension dimRHS; //dimension of the LHS of each equation
+		Stringmension one; //used to determine dimension of equation left hand side
+		Stringmension two;//used to determine dimension of equation right hand side
+		Dimension dimLHS; //final dimension of the LHS of each equation
+		Dimension dimRHS; //final dimension of the RHS of each equation
 		
 		//checks that the equations line up correctly and are split into RHS and LHS equally
 		TripleList RHS = equationID.createTriple("hasRHS");
@@ -58,8 +64,7 @@ public class EquationValidator {
 
 		for(int i =0; i<nameURI.size(); i++) { //processes each equation in the ontology based on its URI, adds triples to tempModel
 			
-			//System.out.println("Proportionality: " + equationID.checkProportionality(nameURI.get(i)));
-
+			//Properties and resources needed to write dimensionality RDF triples
 			Property isConsistent = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#isConsistentWith");
 			Property isNotConsistent = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#isNotConsistentWith");
 			Property hasDimensionVector = ResourceFactory.createProperty("http://modelmeth.nist.gov/manufacturing#hasDimensionVector");
@@ -70,23 +75,21 @@ public class EquationValidator {
 			Resource c = tempModel.createResource("http://modelmeth.nist.gov/manufacturing#" + nameURI.get(i));
 			Resource d = tempModel.createResource("http://modelmeth.nist.gov/manufacturing#" + "UndeterminedExponent");
 			Resource f = tempModel.createResource("http://modelmeth.nist.gov/manufacturing#" + "UnequalDimensions");
-
+			
+			//analyze dimensionality
 			try 
 			{	
+				//initial query Strings
 				String equationLHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:X . \n "
 						+ "_:X mfi:hasLHS _:Y .\n _:Y ";
 				String equationRHS = "mfi:" +nameURI.get(i)+" mfi:hasRelation _:X . \n "
 						+ "_:X mfi:hasRHS _:Y .\n _:Y ";
-
-				System.out.println("EQUATION URI: " + nameURI.get(i));
-
+				
+				//determining dimensionality of each side using Identifier class
 				one = equationID.totalDimension(equationLHS, 0, systemOfUnits);
-				two=equationID.totalDimension(equationRHS, 0, systemOfUnits);
+				two = equationID.totalDimension(equationRHS, 0, systemOfUnits);
 				dimLHS = one.dimension;
 				dimRHS = two.dimension;
-
-				System.out.println("LHS Dimensions: " + dimLHS.toString());
-				System.out.println("RHS Dimensions: " + dimRHS.toString());
 
 				//triples about dimensionality of each side
 				Literal aDim = ResourceFactory.createStringLiteral(dimRHS.getVector());
@@ -114,11 +117,11 @@ public class EquationValidator {
 
 			System.out.println();
 			System.out.println();
-		}
-
-		String fileName = "tempOntology.ttl"; //name of file where triples are stored, located in workspace		
+		}		
 		
-		try //write triples to a new file
+		//write triples to a new file
+		String fileName = "tempOntology.ttl"; //name of file where triples are stored, located in workspace
+		try 
 		{	
 			File file = new File(fileName); 
 			if(!file.exists()) {
@@ -134,11 +137,9 @@ public class EquationValidator {
 		}
 		catch (IOException e)
 		{
-			System.out.println("I guess an error occurred when trying to write the triples to a file. ");
+			System.out.println("An error occurred when trying to write the triples to a file. ");
 		}
-
 	}
-
 }
 
 /*

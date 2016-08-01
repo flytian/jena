@@ -5,6 +5,17 @@ import java.util.ArrayList;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Resource;
 
+/*
+ * Used to store dimension vectors of equations when using the Planck system of units. 
+ * There are seven instance variables: one that stores the name of the units creating the dimension
+ * vector and six to hold each component of the vector. The six vector components are length, mass,
+ * time, thermodynamic temperature, electric charge, and a dimension-less component.
+ * 
+ * There are methods in place to set and get each instance variable, as well as a toString() method.
+ * Additionally, there are methods to multiply, divide, and determine equality between PlanckDimension 
+ * objects by looking at the values of the instance variables.
+ */
+
 public class PlanckDimension implements Dimension{
 	private String dimensionUnits; //name of units
 	
@@ -15,10 +26,17 @@ public class PlanckDimension implements Dimension{
 	private int Q; //electric charge
 	private int U; //dimension-less 
 	
+	//CONSTRUCTORS
+	
 	public PlanckDimension() {
 		dimensionUnits = null;
 	}
 	
+	/*
+	 * Uses SPARQL queries to determine the dimension vector of a unit. 
+	 * The parameter dimensionIn should be the name of a unit found in 
+	 * the Planck system of units.
+	 */
 	public PlanckDimension(String dimensionIn) {
 		dimensionUnits = dimensionIn;
 		
@@ -26,19 +44,18 @@ public class PlanckDimension implements Dimension{
 		String quantityString=null;
 		String quantityKind=null;
 		
-		/*
+		//check that the system of units matches the parameter units
 		String checkSystem = prefixes + NL + 
 				"ASK { Unit:" + dimensionUnits + "rdf:type qudt:NotUsedWithSIUnits } ";
 		Query systemQuery = QueryFactory.create(checkSystem, Syntax.syntaxSPARQL);
 		QueryExecution systemqexec = QueryExecutionFactory.create(systemQuery, unitsOntology);
 		Boolean nonSIsystem = systemqexec.execAsk();
 		systemqexec.close();
-		
 		if(nonSIsystem == false) {
 			throw new IncorrectSystemOfUnitsException();
 		}
-		*/
 		
+		//find the quantity kind (i.e; Area) corresponding to the dimensionUnits
 		String findQuantityKind = prefixes + NL +
 				"SELECT ?quantity " + NL +
 				"WHERE { \n"
@@ -53,14 +70,17 @@ public class PlanckDimension implements Dimension{
 		for (; rs.hasNext() ; ) {				
 			QuerySolution rb = rs.nextSolution();
 			Resource quantity = (Resource) rb.getResource("quantity"); 
-			quantityString = quantity.getLocalName();
+			quantityString = quantity.getLocalName(); //output of form BlahBlahUnit
 		}
 		queryExec.close();
-		quantityString = quantityString.substring(5);	
+		
+		//format the quantity kind String to allow for querying 
 		quantityKind = quantityString.replaceAll("Unit", "");
 		
+		//determine the dimension vector
 		switch (quantityKind)
 		{
+		//if it's a base unit
 		case "Length" :
 			L=1;
 			break;
@@ -79,10 +99,12 @@ public class PlanckDimension implements Dimension{
 		case "Dimensionless" :
 			U=1;
 			break;
+		//not a base unit
 		default :
 		
-		ArrayList<String> results = new ArrayList<String>(); 
+		ArrayList<String> results = new ArrayList<String>(); //holds list of base unit vectors
 		
+		//querying for qudt:dimensionVector results
 		String queryString = prefixes + NL +
 				"SELECT ?vector " + NL +
 				"WHERE { ?dimension qudt:referenceQuantity qudt-quantity:" + quantityKind + " ; \n "
@@ -101,6 +123,8 @@ public class PlanckDimension implements Dimension{
 		}
 		qexec.close();
 		
+		//iterate through the results ArrayList and assign each element to its corresponding
+		//instance variable
 		for (int i=0; i<results.size(); i++) {
 			if(results.get(i).indexOf('L')!= -1) {
 				if(results.get(i).indexOf('-')!= -1) {
@@ -146,11 +170,17 @@ public class PlanckDimension implements Dimension{
 		
 	}
 	
+	//METHODS
+	
+		/*
+		 * returns a String representation of the dimension vector
+		 */
 	public String toString() {
 		return dimensionUnits + " (M^" + M + " L^" + L + " T^" + T
 				+ " theta^" + theta + " Q^" + Q  + " U^" + U+ ")";
 	}
 	
+	//getters
 	public String getDimensionUnits() {
 		return dimensionUnits;
 	}
@@ -176,6 +206,7 @@ public class PlanckDimension implements Dimension{
 		return U;
 	}
 	
+	//setters
 	public void setDimensionUnits(String nameIn) {
 		dimensionUnits = nameIn;
 	}
@@ -198,6 +229,12 @@ public class PlanckDimension implements Dimension{
 		U = dimensionIn;
 	}
 	
+	/*
+	 * This method compares the current object to another object to determine
+	 * if the two have equivalent dimension vectors. It does this by first
+	 * comparing the dimensionUnits string, and then comparing each vector
+	 * component individually. It returns a boolean value of either true or false.
+	 */
 	public boolean equals(Object otherDimension) {
 		if(!(otherDimension instanceof PlanckDimension)) {
 			return false;
@@ -229,6 +266,12 @@ public class PlanckDimension implements Dimension{
 		}
 	}
 	
+	/*
+	 * This method multiplies two PlanckDimension objects by combining the dimensionUnits
+	 * strings and adding the vector component values of the two objects together to create
+	 * new vector component values. For example, it will add the values of the length
+	 * components together. It returns a new PlanckDimension object.
+	 */
 	public Dimension multiply(Dimension otherDimension) {
 		PlanckDimension otherCopy = (PlanckDimension) otherDimension;
 		
@@ -246,6 +289,13 @@ public class PlanckDimension implements Dimension{
 		return newDimension;
 	}
 	
+	/*
+	 * This method divides two PlanckDimension objects by combining the dimensionUnits
+	 * strings and subtracting the vector component values of the two objects to create
+	 * new vector component values. The current object is divided by the parameter.
+	 * For example, it will subtract the value of the parameter object's length component
+	 * from the value of the current object's length component. It returns a new PlanckDimension object.
+	 */
 	public Dimension divide(Dimension otherDimension) {
 		PlanckDimension otherCopy = (PlanckDimension) otherDimension;
 		

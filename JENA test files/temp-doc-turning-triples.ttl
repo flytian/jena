@@ -1,0 +1,174 @@
+@prefix : <http://modelmeth.nist.gov/manufacturing#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/1.1/schema/qudt#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://modelmeth.nist.gov/manufacturing> rdf:type owl:Ontology .
+
+###  http://modelmeth.nist.gov/manufacturing#hasNumericalValue
+:hasNumericalValue rdf:type owl:DatatypeProperty ;
+          rdfs:range xsd:decimal .
+		  
+###  http://modelmeth.nist.gov/manufacturing#description
+:description rdf:type owl:DatatypeProperty ;
+          rdfs:range xsd:string .
+
+:D :hasNumericalValue 98.0 ;
+	:hasUnits :Millimeter ;
+	:hasConcept :FinalDimension , :Diameter , :WorkpieceDimension , :Constant ;
+	:description "Final Dimension" .
+:delta_i :hasNumericalValue 0.050 ;
+	:hasUnits :Millimeter ;
+	:hasConcept :DepthOfCut , :ToolWear ;
+	:description "Toolwear Compensation" .
+:d_i :hasNumericalValue 1.05 ;
+	:hasUnits :Millimeter ;
+	:hasConcept :DepthOfCut ;
+	:description "Depth of Cut" .
+:V :hasNumericalValue 70.0 ;
+	:hasUnits :MeterPerMinute ;
+	:hasConcept :CuttingSpeed ;
+	:description "Cutting Speed" .
+:f :hasNumericalValue 0.0898  ;
+	:hasUnits :Millimeter ; #actually MillimeterPerRevolution but no equivalent in units vocab
+	:hasConcept :CuttingFeedRate ;
+	:description "Cutting Feed Rate" .
+:N :hasNumericalValue 1 ;
+	:description "Tool Regrind Scenario" ;
+	:hasUnits :Unitless ;
+	:hasConcept :MachineToolChanger , :TotalProcessValue .
+
+:D_0 :hasNumericalValue 100.0 ;
+	:hasUnits :Millimeter ;
+	:hasConcept :Diameter , :InitialDimension , :WorkpieceDimension , :Constant .
+:L :hasNumericalValue 35.0 ;
+	:hasUnits :Millimeter ;
+	:hasConcept :FinalDimension , :Length , :WorkpieceDimension , :Constant .
+:D_i :hasUnits :Millimeter ;
+	 :hasAnnotation :bar .
+:t_ci :hasUnits :SecondTime .
+
+
+:W_i :hasConcept :ToolWear , :TotalProcessValue , :CalculatedValue ;
+	:hasUnits :Millimeter .
+:W_i-1 :hasConcept :ToolWear , :TotalProcessValue , :CalculatedValue ;
+	:hasUnits :Millimeter . 
+:w_i :hasConcept :ToolWear , :IndividualPartValue , :CalculatedValue ;
+	:hasUnits :Millimeter .
+:t_wi :hasConcept :CumulativeUse , :TotalProcessValue , :ProcessTime , :CalculatedValue;
+	:hasUnits :SecondTime .
+:T_N :hasUnits :MinuteTime .
+:W :hasNumericalValue 0.40 ;
+	:hasAnnotation :hat ;
+	:hasUnits :Micrometer ;
+	:hasConcept :ToolWear , :MaximumAcceptedValue , :Constant ;
+	:hasURI <http://modelmeth.nist.gov/manufacturing#maxToolWear> .
+:Delta_i :hasConcept :Drift ;
+	:hasURI <http://modelmeth.nist.gov/manufacturing#Drift> ;
+	:hasUnits :Millimeter .
+:Theta :hasNumericalValue 15  ;
+	:hasUnits :DegreeAngle ;
+	:hasConcept :ToolClearanceAngle , :Constant ;
+	:hasURI <http://modelmeth.nist.gov/manufacturing#ToolClearanceAngle> .
+	
+:k_w :hasNumericalValue 0.000082961 ;
+	:hasConcept :Constant .
+:alpha_w :hasNumericalValue 2.747 ;
+	:hasConcept :Constant .
+:beta_w :hasNumericalValue 1.473  ;
+	:hasConcept :Constant .
+:gamma_w :hasNumericalValue 1.261 ;
+	:hasConcept :Constant .
+:sigma_w :hasNumericalValue 0.43 ;
+	:hasConcept :Constant .
+
+:k_r :hasNumericalValue 11.619 ;
+	:hasConcept :Constant .
+:alpha_r :hasNumericalValue  0.261 ;
+	:hasConcept :Constant .
+:beta_r :hasNumericalValue 0.565 ;
+	:hasConcept :Constant .
+:gamma_r :hasNumericalValue 0.565 ;
+	:hasConcept :Constant .
+:sigma_r :hasNumericalValue 0.08887 ;
+	:hasConcept :Constant .
+
+:k_c :hasNumericalValue 1514.6 ;
+	:hasConcept :Constant .
+:alpha_c :hasNumericalValue  0.0992 ;
+	:hasConcept :Constant .
+:beta_c :hasNumericalValue 1.016  ;
+	:hasConcept :Constant .
+:gamma_c :hasNumericalValue 1.033 ;
+	:hasConcept :Constant .
+:sigma_c :hasNumericalValue 0.03877 ;
+	:hasConcept :Constant .
+
+:C_h :hasNumericalValue 0.5 ;
+	:hasConcept :Cost , :Constant ;
+	:hasUnits  :PerSecond . # should be :USDollarPerMinute but no equivalent in units vocab
+:C_w :hasNumericalValue 0.5 ;
+	:hasConcept :Cost , :Constant ;
+	:hasUnits  :PerSecond . # should be :USDollarPerMinute but no equivalent in units vocab
+:C_z :hasNumericalValue 2.0 ;
+	:hasConcept :Cost , :Constant ;
+	:hasUnits  :PerSecond. # should be :USDollarPerMinute but no equivalent in units vocab
+:t_h :hasNumericalValue 2.0 ;
+	:hasConcept :IndividualPartValue , :ProcessTime ;
+	:hasUnits :MinuteTime .
+:C_g :hasNumericalValue 20.0 ;
+	:hasConcept :Cost , :Constant ;
+	:hasUnits :Unitless . # should be :USDollar but no equivalent in units vocab
+:p :hasNumericalValue 37.5 ;
+	:hasUnits :Unitless ; # should be :USDollar but no equivalent in units vocab
+	:hasConcept :Revenue .
+:scriptl_d :hasNumericalValue 125.0 ;
+	:hasConcept	:Cost , :Diameter ;
+	:hasUnits :Unitless . # should be :USDollarPerMillimeterSquared but no equivalent in units vocab
+:scriptl_r :hasNumericalValue 0.0075 ;
+	:hasConcept :Cost , :SurfaceRoughness ;
+	:hasUnits :Unitless . # should be :USDollarPerMillimeterSquared but no equivalent in units vocab
+:R :hasNumericalValue 2.5  ;
+	:hasConcept :SurfaceRoughness , :TargetValue , :Constant ;
+	:hasURI <http://modelmeth.nist.gov/manufacturing#targetSurfaceRoughness> ;
+	:hasUnits :Micrometer .
+
+:f_min :hasNumericalValue 0.08 ;
+	:hasConcept :CuttingFeedRate , :MinimumAcceptableValue , :Constant ;
+	:hasUnits :MillimeterPerRevolution . #no equivalent in units vocab
+:f_max :hasNumericalValue 0.28 ;
+	:hasConcept :CuttingFeedRate , :MaximumAcceptableValue , :Constant ;
+	:hasUnits :MillimeterPerRevolution . #no equivalent in units vocab
+:V_min :hasNumericalValue 32.0 ; 
+	:hasConcept :CuttingSpeed , :MinimumAcceptableValue , :Constant ;
+	:hasUnits :MeterPerMinute .
+:V_max :hasNumericalValue 70.0 ;
+	:hasConcept :CuttingSpeed , :MaximumAcceptableValue  , :Constant ;
+	:hasUnits :MeterPerMinute .
+:d_min :hasNumericalValue 0.5 ;
+	:hasConcept :DepthOfCut , :MinimumAcceptableValue , :Constant ;
+	:hasUnits :Millimeter .
+:d_max :hasNumericalValue 1.5 ;	
+	:hasConcept :DepthOfCut , :MaximumAcceptableValue , :Constant ;
+	:hasUnits :Millimeter .
+:power_max :hasNumericalValue 15000.0  ;
+	:hasConcept :Horsepower , :MaximumAcceptableValue , :Constant ;
+	:hasUnits :Watt .
+:D_LSL :hasNumericalValue 97.9 ;
+ 	:hasUnits :Millimeter ;
+	:hasConcept :FinalDimension , :Diameter , :WorkpieceDimension , :MinimumAcceptableValue  , :Constant .
+:D_USL :hasNumericalValue 98.1 ;
+	:hasUnits :Millimeter ;
+	:hasConcept :FinalDimension , :Diameter , :WorkpieceDimension , :MaximumAcceptableValue  , :Constant .
+:R_USL :hasNumericalValue 10.0  ;
+	:hasConcept :SurfaceRoughness , :MaximumAcceptableValue  , :Constant ;
+	:hasUnits :Micrometer .
+	
+:Phi_i :hasNumericalValue 9.73838 ;
+	:hasConcept :SurfaceRoughness , :CalculatedValue ; 
+	:hasUnits :Micrometer .
+:F_i :hasConcept :CuttingForce , :CalculatedValue .
+	
